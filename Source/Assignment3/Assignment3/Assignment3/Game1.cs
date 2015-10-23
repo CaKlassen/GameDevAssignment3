@@ -18,11 +18,19 @@ namespace Assignment3
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        BasicEffect effect;
+
+        Camera camera;
+        Model test;
 
         public BaseGame()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+            graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+            graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
+            IsMouseVisible = false;
+            graphics.IsFullScreen = true;
         }
 
         /// <summary>
@@ -34,7 +42,9 @@ namespace Assignment3
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-
+            camera = new Camera(this, new Vector3(10f, 2f, 5f), Vector3.Zero, 5f);
+            Components.Add(camera);
+            effect = new BasicEffect(GraphicsDevice);
             base.Initialize();
         }
 
@@ -47,7 +57,7 @@ namespace Assignment3
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            // TODO: use this.Content to load your game content here
+            test = Content.Load<Model>("Models/exitDoor");
         }
 
         /// <summary>
@@ -67,7 +77,7 @@ namespace Assignment3
         protected override void Update(GameTime gameTime)
         {
             // Allows the game to exit
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 this.Exit();
 
             // TODO: Add your update logic here
@@ -83,6 +93,31 @@ namespace Assignment3
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
+
+            if (test != null)//don't do anything if the model is null
+            {
+                // Copy any parent transforms.
+                Matrix[] transforms = new Matrix[test.Bones.Count];
+                test.CopyAbsoluteBoneTransformsTo(transforms);
+
+                // Draw the model. A model can have multiple meshes, so loop.
+                foreach (ModelMesh mesh in test.Meshes)
+                {
+
+                    // This is where the mesh orientation is set, as well as our camera and projection.
+                    foreach (BasicEffect effect in mesh.Effects)
+                    {
+                        effect.EnableDefaultLighting();//lighting
+                        
+                        effect.World = transforms[mesh.ParentBone.Index] * Matrix.CreateScale (0.01f,0.01f,0.01f)
+                            * Matrix.CreateTranslation(Vector3.Zero);
+                        effect.View = camera.View;
+                        effect.Projection = camera.Projection;
+                    }
+                    // Draw the mesh, using the effects set above.
+                    mesh.Draw();
+                }
+            }
             // TODO: Add your drawing code here
 
             base.Draw(gameTime);
