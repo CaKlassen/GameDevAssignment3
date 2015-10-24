@@ -21,8 +21,8 @@ namespace Assignment3.Scenes
         private BasicEffect effect;
         
         private float AspectRatio;
-
-        private List<Entity> modelList = new List<Entity>();
+        
+        private List<Entity> wallList = new List<Entity>();
 
 
         public MazeScene()
@@ -38,8 +38,9 @@ namespace Assignment3.Scenes
 
             effect = new BasicEffect(BaseGame.instance.GraphicsDevice);
 
-            // TEMP: Create a wall
-            modelList.Add(new Wall(content));
+            // TEMP: Create some walls
+            wallList.Add(new Wall(content, new Vector3(0, 0, 0)));
+            wallList.Add(new Wall(content, new Vector3(10, 0, 0)));
         }
 
         public override void update(GameTime gameTime, GamePadState gamepad, KeyboardState keyboard)
@@ -53,7 +54,7 @@ namespace Assignment3.Scenes
             camera.Update(gameTime);
 
             // Update the model list
-            foreach (Entity e in modelList)
+            foreach (Entity e in wallList)
             {
                 e.update(gameTime, gamepad, keyboard);
             }
@@ -62,7 +63,7 @@ namespace Assignment3.Scenes
         public override void draw(SpriteBatch sb)
         {
             // Render the model list
-            foreach (Entity e in modelList)
+            foreach (Entity e in wallList)
             {
                 e.draw(sb);
             }
