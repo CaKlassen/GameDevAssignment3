@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Assignment3
 {
-    class Camera
+    public class Camera
     {
         //Attributes (variables)
         private Vector3 cameraPos;//camera postion (x,y,z)
