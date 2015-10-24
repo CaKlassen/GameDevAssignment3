@@ -15,6 +15,7 @@ namespace Assignment3
         private float cameraSpeed;//movement speed
         private Vector3 LookAt;//What the camera is looking at
         private Vector3 mouseRotationBuffer;
+        private Vector3 RS;
         private MouseState curMS;
         private MouseState prevMS;
 
@@ -80,6 +81,7 @@ namespace Assignment3
             this.VPW = VPW;
 
             mouseRotationBuffer.X = rotation.Y;
+            RS.X = rotation.Y;
             //set cam pos and rot
             MoveTo(position, rotation);
 
@@ -124,77 +126,123 @@ namespace Assignment3
             curMS = Mouse.GetState();
 
             KeyboardState kbs = Keyboard.GetState();
+            GamePadState gps = GamePad.GetState(PlayerIndex.One);
 
             Vector3 moveVector = Vector3.Zero; //which direction are we going?
 
-            if(kbs.IsKeyDown(Keys.W))
+            //no controller, so use KB+M
+            if (!gps.IsConnected)
             {
-                moveVector.Z = 1;
-            }
-
-            if(kbs.IsKeyDown(Keys.S))
-            {
-                moveVector.Z = -1;
-            }
-
-            if(kbs.IsKeyDown(Keys.A))
-            {
-                moveVector.X = 1;
-            }
-
-            if(kbs.IsKeyDown(Keys.D))
-            {
-                moveVector.X = -1;
-            }
-
-            //if we are moving
-            if(moveVector != Vector3.Zero)
-            {
-                moveVector.Normalize();
-                moveVector *= DeltaTime * cameraSpeed;
-
-                //move camera
-                Move(moveVector);
-            }
-
-            //Mouse Movement
-            float deltaX;
-            float deltaY;
-
-            if(curMS != prevMS)
-            {
-                //cache mouse location (to always be relative to middle of screen)
-                deltaX = curMS.X - (VPW / 2);
-                deltaY = curMS.Y - (VPH / 2);
-
-                //smooths mouse movement; creates rotation
-                mouseRotationBuffer.X -= 0.01f * deltaX * DeltaTime;
-                mouseRotationBuffer.Y -= 0.01f * deltaY * DeltaTime;
-
-                if(mouseRotationBuffer.Y < MathHelper.ToRadians(-75f))
+                //keyboard
+                if (kbs.IsKeyDown(Keys.W))
                 {
-                    mouseRotationBuffer.Y = mouseRotationBuffer.Y - (mouseRotationBuffer.Y - MathHelper.ToRadians(-75f));
+                    moveVector.Z = 1;
                 }
 
-                if(mouseRotationBuffer.Y > MathHelper.ToRadians(75f))
+                if (kbs.IsKeyDown(Keys.S))
                 {
-                    mouseRotationBuffer.Y = mouseRotationBuffer.Y - (mouseRotationBuffer.Y - MathHelper.ToRadians(75f));
+                    moveVector.Z = -1;
                 }
 
-                //limit Y to only 75 for looking up or down; wrap X (make it 360)
-                Rotation = new Vector3(-MathHelper.Clamp(mouseRotationBuffer.Y, MathHelper.ToRadians(-75f), MathHelper.ToRadians(75f)), MathHelper.WrapAngle(mouseRotationBuffer.X), 0);
+                if (kbs.IsKeyDown(Keys.A))
+                {
+                    moveVector.X = 1;
+                }
 
-                deltaX = 0;
-                deltaY = 0;
+                if (kbs.IsKeyDown(Keys.D))
+                {
+                    moveVector.X = -1;
+                }
 
+                //if we are moving
+                if (moveVector != Vector3.Zero)
+                {
+                    moveVector.Normalize();
+                    moveVector *= DeltaTime * cameraSpeed;
+
+                    //move camera
+                    Move(moveVector);
+                }
+
+                //Mouse Movement
+                float deltaX;
+                float deltaY;
+
+                if (curMS != prevMS)
+                {
+                    //cache mouse location (to always be relative to middle of screen)
+                    deltaX = curMS.X - (VPW / 2);
+                    deltaY = curMS.Y - (VPH / 2);
+
+                    //smooths mouse movement; creates rotation
+                    mouseRotationBuffer.X -= 0.01f * deltaX * DeltaTime;
+                    mouseRotationBuffer.Y -= 0.01f * deltaY * DeltaTime;
+
+                    if (mouseRotationBuffer.Y < MathHelper.ToRadians(-75f))
+                    {
+                        mouseRotationBuffer.Y = mouseRotationBuffer.Y - (mouseRotationBuffer.Y - MathHelper.ToRadians(-75f));
+                    }
+
+                    if (mouseRotationBuffer.Y > MathHelper.ToRadians(75f))
+                    {
+                        mouseRotationBuffer.Y = mouseRotationBuffer.Y - (mouseRotationBuffer.Y - MathHelper.ToRadians(75f));
+                    }
+
+                    //limit Y to only 75 for looking up or down; wrap X (make it 360)
+                    Rotation = new Vector3(-MathHelper.Clamp(mouseRotationBuffer.Y, MathHelper.ToRadians(-75f), MathHelper.ToRadians(75f)), MathHelper.WrapAngle(mouseRotationBuffer.X), 0);
+
+                    deltaX = 0;
+                    deltaY = 0;
+
+                }
+
+
+                //set cursor back to the middle of screen
+                Mouse.SetPosition(VPW / 2, VPH / 2);
+                prevMS = curMS;
             }
 
-            //set cursor back to the middle of screen
-            Mouse.SetPosition(VPW / 2, VPH / 2);
 
-            prevMS = curMS;
+
+            //There is a controller, so don't use M+KB; Only use Controller
+            if (gps.IsConnected)
+            {
+                //Controller camera movement
+                moveVector.X = gps.ThumbSticks.Left.X * -1;
+                moveVector.Z = gps.ThumbSticks.Left.Y;
+
+                //if we are moving
+                if (moveVector != Vector3.Zero)
+                {
+                    moveVector.Normalize();
+                    moveVector *= DeltaTime * cameraSpeed;
+
+                    //move camera
+                    Move(moveVector);
+                }
+
+                //Controller camera rotation
+                float rotX = gps.ThumbSticks.Right.X;
+                float rotY = gps.ThumbSticks.Right.Y * -1;
+
+                RS.X -= rotX * DeltaTime;
+                RS.Y -= rotY * DeltaTime;
+
+                if (RS.Y < MathHelper.ToRadians(-75f))
+                {
+                    RS.Y = RS.Y - (RS.Y - MathHelper.ToRadians(-75f));
+                }
+
+                if (RS.Y > MathHelper.ToRadians(75f))
+                {
+                    RS.Y = RS.Y - (RS.Y - MathHelper.ToRadians(75));
+                }
+
+                Rotation = new Vector3(-MathHelper.Clamp(RS.Y, MathHelper.ToRadians(-75f), MathHelper.ToRadians(75f)), MathHelper.WrapAngle(RS.X), 0);
+            }
+
         }
 
-        
+
     }
 }
