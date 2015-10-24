@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Assignment3
 {
-    class Camera : GameComponent
+    class Camera
     {
         //Attributes (variables)
         private Vector3 cameraPos;//camera postion (x,y,z)
@@ -17,6 +17,10 @@ namespace Assignment3
         private Vector3 mouseRotationBuffer;
         private MouseState curMS;
         private MouseState prevMS;
+
+        private int VPH;
+        private int VPW;
+        private float AspectRatio;
 
 
         //properties
@@ -61,15 +65,21 @@ namespace Assignment3
         /// Constructor.
         /// sets up the camera.
         /// </summary>
-        /// <param name="game">game component</param>
         /// <param name="position">camera's position to set</param>
         /// <param name="rotation">camera's rotation to set</param>
-        /// <param name="speed">camera's speed</param>
-        public Camera(Game game, Vector3 position, Vector3 rotation, float speed) : base(game)
+        /// <param name="speed">camera's movement speed</param>
+        /// <param name="aspectRatio">the game's aspect ratio.</param>
+        /// <param name="VPH">the game's ViewPort Height.</param>
+        /// <param name="VPW">the game's ViewPort Width.</param>
+        public Camera(Vector3 position, Vector3 rotation, float speed, float aspectRatio, int VPH, int VPW)
         {
             cameraSpeed = speed;
-            Projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(45f), Game.GraphicsDevice.Viewport.AspectRatio, 0.05f, 1000f);
+            Projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(45f), aspectRatio, 0.05f, 1000f);
 
+            this.VPH = VPH;
+            this.VPW = VPW;
+
+            mouseRotationBuffer.X = rotation.Y;
             //set cam pos and rot
             MoveTo(position, rotation);
 
@@ -107,7 +117,7 @@ namespace Assignment3
         }
         
         //update method
-        public override void Update(GameTime gameTime)
+        public void Update(GameTime gameTime)
         {
             float DeltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
@@ -154,8 +164,8 @@ namespace Assignment3
             if(curMS != prevMS)
             {
                 //cache mouse location (to always be relative to middle of screen)
-                deltaX = curMS.X - (Game.GraphicsDevice.Viewport.Width / 2);
-                deltaY = curMS.Y - (Game.GraphicsDevice.Viewport.Height / 2);
+                deltaX = curMS.X - (VPW / 2);
+                deltaY = curMS.Y - (VPH / 2);
 
                 //smooths mouse movement; creates rotation
                 mouseRotationBuffer.X -= 0.01f * deltaX * DeltaTime;
@@ -180,11 +190,9 @@ namespace Assignment3
             }
 
             //set cursor back to the middle of screen
-            Mouse.SetPosition(Game.GraphicsDevice.Viewport.Width / 2, Game.GraphicsDevice.Viewport.Height / 2);
+            Mouse.SetPosition(VPW / 2, VPH / 2);
 
             prevMS = curMS;
-
-            base.Update(gameTime);
         }
 
         
