@@ -8,23 +8,36 @@ using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
+using Assignment3.Scenes; 
 
 namespace Assignment3
 {
+    public enum SceneType
+    {
+        MENU,
+        MAZE
+    }
+
     /// <summary>
     /// This is the main type for your game
     /// </summary>
     public class BaseGame : Microsoft.Xna.Framework.Game
     {
+        public static BaseGame instance;
+
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         BasicEffect effect;
+
+        private Scene currentScene = null;
 
         Camera camera;
         Model test;
 
         public BaseGame()
         {
+            instance = this;
+
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
@@ -41,7 +54,9 @@ namespace Assignment3
         /// </summary>
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
+            // Set the start scene
+            currentScene = new MenuScene();
+
             camera = new Camera(this, new Vector3(10f, 2f, 5f), Vector3.Zero, 5f);
             Components.Add(camera);
             effect = new BasicEffect(GraphicsDevice);
@@ -56,6 +71,9 @@ namespace Assignment3
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            // Load the start scene
+            currentScene.onLoad(Content);
 
             test = Content.Load<Model>("Models/exitDoor");
         }
@@ -80,7 +98,12 @@ namespace Assignment3
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 this.Exit();
 
-            // TODO: Add your update logic here
+            // Get the gamepad and keyboard state
+            GamePadState gamepad = GamePad.GetState(PlayerIndex.One);
+            KeyboardState keyboard = Keyboard.GetState();
+
+            // Update the current scene
+            currentScene.update(gamepad, keyboard);
 
             base.Update(gameTime);
         }
@@ -93,6 +116,8 @@ namespace Assignment3
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
+            // Render the current scene
+            currentScene.draw(spriteBatch);
 
             if (test != null)//don't do anything if the model is null
             {
@@ -121,6 +146,26 @@ namespace Assignment3
             // TODO: Add your drawing code here
 
             base.Draw(gameTime);
+        }
+
+        public void changeScene(SceneType scene)
+        {
+            switch(scene)
+            {
+                case SceneType.MENU:
+                {
+                    currentScene = new MenuScene();
+                    break;
+                }
+
+                case SceneType.MAZE:
+                {
+                    currentScene = new MazeScene();
+                    break;
+                }
+            }
+            
+            currentScene.onLoad(Content);
         }
     }
 }
