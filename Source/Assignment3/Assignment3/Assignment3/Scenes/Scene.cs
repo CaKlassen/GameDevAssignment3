@@ -21,7 +21,7 @@ namespace Assignment3.Scenes
 
         public abstract void onLoad(ContentManager content);
 
-        public abstract void update(GamePadState gamepad, KeyboardState keyboard);
+        public abstract void update(GameTime gameTime, GamePadState gamepad, KeyboardState keyboard);
 
         public abstract void draw(SpriteBatch sb);
     }

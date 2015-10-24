@@ -24,7 +24,7 @@ namespace Assignment3.Scenes
 
         }
 
-        public override void update(GamePadState gamepad, KeyboardState keyboard)
+        public override void update(GameTime gameTime, GamePadState gamepad, KeyboardState keyboard)
         {
             if (keyboard.IsKeyDown(Keys.Enter))
             {

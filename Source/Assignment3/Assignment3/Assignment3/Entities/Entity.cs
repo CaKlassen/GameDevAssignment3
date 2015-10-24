@@ -19,7 +19,7 @@ namespace Assignment3.Entities
 
         }
         
-        public abstract void update(KeyboardState keyboard, GamePadState gamepad);
+        public abstract void update(GameTime gameTime, GamePadState gamepad, KeyboardState keyboard);
 
         public abstract void draw(SpriteBatch sb);
     }
