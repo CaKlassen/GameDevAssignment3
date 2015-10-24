@@ -34,14 +34,19 @@ namespace Assignment3
         Camera camera;
         Model test;
 
+        public int BackBufferWidth;
+        public int BackBufferHeight;
+        float AspectRatio;
+
         public BaseGame()
         {
             instance = this;
 
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
-            graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
+            BackBufferHeight = graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+            BackBufferWidth = graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
+            
             IsMouseVisible = false;
             graphics.IsFullScreen = true;
         }
@@ -56,9 +61,9 @@ namespace Assignment3
         {
             // Set the start scene
             currentScene = new MenuScene();
-
-            camera = new Camera(this, new Vector3(10f, 2f, 5f), Vector3.Zero, 5f);
-            Components.Add(camera);
+            AspectRatio = GraphicsDevice.Viewport.AspectRatio;
+            camera = new Camera(new Vector3(10f, 2f, 5f), new Vector3(0f,180f,0f), 10f, AspectRatio,GraphicsDevice.Viewport.Height, GraphicsDevice.Viewport.Width);
+            
             effect = new BasicEffect(GraphicsDevice);
             base.Initialize();
         }
@@ -104,6 +109,8 @@ namespace Assignment3
 
             // Update the current scene
             currentScene.update(gamepad, keyboard);
+
+            camera.Update(gameTime);
 
             base.Update(gameTime);
         }
