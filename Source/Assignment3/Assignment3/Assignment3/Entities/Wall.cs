@@ -16,9 +16,12 @@ namespace Assignment3.Entities
     public class Wall : Entity
     {
         private Model model;
+        private Vector3 pos;
 
-        public Wall(ContentManager content)
+        public Wall(ContentManager content, Vector3 pos)
         {
+            this.pos = pos;
+
             model = content.Load<Model>("Models/Wall");
         }
         
@@ -43,7 +46,7 @@ namespace Assignment3.Entities
                     effect.EnableDefaultLighting();//lighting
 
                     effect.World = transforms[mesh.ParentBone.Index] * Matrix.CreateScale(0.01f, 0.01f, 0.01f)
-                        * Matrix.CreateTranslation(Vector3.Zero);
+                        * Matrix.CreateTranslation(pos);
                     effect.View = MazeScene.instance.camera.View;
                     effect.Projection = MazeScene.instance.camera.Projection;
                 }
