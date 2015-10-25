@@ -13,6 +13,11 @@ using Assignment3.Entities;
 
 namespace Assignment3.Scenes
 {
+    public enum MazeDifficulty
+    {
+        EASY, MEDIUM, HARD
+    }
+
     public class MazeScene : Scene
     {
         public static MazeScene instance;
@@ -24,6 +29,7 @@ namespace Assignment3.Scenes
         
         private List<Entity> collideList = new List<Entity>();
         private bool[,] rawMaze;
+        private Floor floor;
 
 
         public MazeScene()
@@ -33,20 +39,25 @@ namespace Assignment3.Scenes
 
         public override void onLoad(ContentManager content)
         {
+            MazeDifficulty difficulty = MazeCommunication.getDifficulty();
+
             // Generate the maze
-            MazeBuilder builder = new MazeBuilder(10);
+            MazeBuilder builder = new MazeBuilder(((int)difficulty + 1) * 10);
             rawMaze = builder.buildMaze();
 
             builder.generateWalls(content, collideList);
             Vector2 startPos = builder.getStartPos();
 
+            // Create the floor
+            Vector3 floorPos = new Vector3(rawMaze.GetLength(0) / 2f, 0, rawMaze.GetLength(0) / 2f);
+            floor = new Floor(content, floorPos, rawMaze.GetLength(0));
+
             // Create the camera/player
             AspectRatio = BaseGame.instance.GraphicsDevice.Viewport.AspectRatio;
-            camera = new Camera(new Vector3(startPos.X * 4, 2f, startPos.Y * 4), new Vector3(0f, 180f, 0f), 10f, AspectRatio, 
+            camera = new Camera(new Vector3(startPos.X * 4, 2f, startPos.Y * 4), new Vector3(0f, 180f, 0f), 10f, AspectRatio,
                 BaseGame.instance.GraphicsDevice.Viewport.Height, BaseGame.instance.GraphicsDevice.Viewport.Width);
 
             effect = new BasicEffect(BaseGame.instance.GraphicsDevice);
-
         }
 
         public override void update(GameTime gameTime, GamePadState gamepad, KeyboardState keyboard)
@@ -68,6 +79,13 @@ namespace Assignment3.Scenes
 
         public override void draw(SpriteBatch sb)
         {
+            // Reset the render state
+            BaseGame.instance.GraphicsDevice.BlendState = BlendState.Opaque;
+            BaseGame.instance.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            BaseGame.instance.GraphicsDevice.SamplerStates[0] = SamplerState.LinearWrap;
+
+            floor.draw(sb);
+
             // Render the model list
             foreach (Entity e in collideList)
             {
