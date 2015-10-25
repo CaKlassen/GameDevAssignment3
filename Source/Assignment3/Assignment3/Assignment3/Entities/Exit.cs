@@ -13,7 +13,7 @@ using Assignment3.Scenes;
 
 namespace Assignment3.Entities
 {
-    public class Wall : Entity
+    public class Exit : Entity
     {
         public static int WALL_LENGTH = 200;
 
@@ -22,14 +22,14 @@ namespace Assignment3.Entities
 
         private float scale = 0.02f;
 
-        public Wall(ContentManager content, Vector3 position)
+        public Exit(ContentManager content, Vector3 position)
         {
             pos = position;
             pos.X *= (WALL_LENGTH * scale);
             pos.Y *= (WALL_LENGTH * scale);
             pos.Z *= (WALL_LENGTH * scale);
 
-            model = content.Load<Model>("Models/Wall");
+            model = content.Load<Model>("Models/Player");
         }
         
         public override void update(GameTime gameTime, GamePadState gamepad, KeyboardState keyboard)
