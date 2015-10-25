@@ -58,10 +58,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Camera.cs" />
+    <Compile Include="Entities\Floor.cs" />
     <Compile Include="Entities\Exit.cs" />
     <Compile Include="Entities\Wall.cs" />
     <Compile Include="Entities\Entity.cs" />
     <Compile Include="MazeBuilder.cs" />
+    <Compile Include="MazeCommunication.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="BaseGame.cs" />
