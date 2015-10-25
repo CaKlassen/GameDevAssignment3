@@ -22,7 +22,8 @@ namespace Assignment3.Scenes
         
         private float AspectRatio;
         
-        private List<Entity> wallList = new List<Entity>();
+        private List<Entity> collideList = new List<Entity>();
+        private bool[,] rawMaze;
 
 
         public MazeScene()
@@ -32,15 +33,20 @@ namespace Assignment3.Scenes
 
         public override void onLoad(ContentManager content)
         {
+            // Generate the maze
+            MazeBuilder builder = new MazeBuilder(10);
+            rawMaze = builder.buildMaze();
+
+            builder.generateWalls(content, collideList);
+            Vector2 startPos = builder.getStartPos();
+
+            // Create the camera/player
             AspectRatio = BaseGame.instance.GraphicsDevice.Viewport.AspectRatio;
-            camera = new Camera(new Vector3(10f, 2f, 5f), new Vector3(0f, 180f, 0f), 10f, AspectRatio, 
+            camera = new Camera(new Vector3(startPos.X * 4, 2f, startPos.Y * 4), new Vector3(0f, 180f, 0f), 10f, AspectRatio, 
                 BaseGame.instance.GraphicsDevice.Viewport.Height, BaseGame.instance.GraphicsDevice.Viewport.Width);
 
             effect = new BasicEffect(BaseGame.instance.GraphicsDevice);
 
-            // TEMP: Create some walls
-            wallList.Add(new Wall(content, new Vector3(0, 0, 0)));
-            wallList.Add(new Wall(content, new Vector3(10, 0, 0)));
         }
 
         public override void update(GameTime gameTime, GamePadState gamepad, KeyboardState keyboard)
@@ -54,7 +60,7 @@ namespace Assignment3.Scenes
             camera.Update(gameTime);
 
             // Update the model list
-            foreach (Entity e in wallList)
+            foreach (Entity e in collideList)
             {
                 e.update(gameTime, gamepad, keyboard);
             }
@@ -63,7 +69,7 @@ namespace Assignment3.Scenes
         public override void draw(SpriteBatch sb)
         {
             // Render the model list
-            foreach (Entity e in wallList)
+            foreach (Entity e in collideList)
             {
                 e.draw(sb);
             }
