@@ -61,6 +61,18 @@ namespace Assignment3.Entities
 
                     effect.EnableDefaultLighting();//lighting
 
+                    //effect.DirectionalLight0.Enabled = true;
+                    //effect.DirectionalLight0.DiffuseColor = Color.Red.ToVector3();
+                    //effect.DirectionalLight0.Direction = Vector3.Normalize(new Vector3(-1, -1.5f, 0));
+
+                    //effect.DirectionalLight1.Enabled = true;
+                    //effect.DirectionalLight1.DiffuseColor = Color.Red.ToVector3();
+                    //effect.DirectionalLight1.Direction = Vector3.Normalize(new Vector3(1, -1.5f, -1));
+
+                    //effect.DirectionalLight2.Enabled = true;
+                    //effect.DirectionalLight2.DiffuseColor = Color.Red.ToVector3();
+                    //effect.DirectionalLight2.Direction = Vector3.Normalize(new Vector3(-1, -1.5f, -1));
+
                     effect.World = transforms[mesh.ParentBone.Index] * Matrix.CreateScale(scale)
                         * Matrix.CreateTranslation(pos);
                     effect.View = MazeScene.instance.camera.View;

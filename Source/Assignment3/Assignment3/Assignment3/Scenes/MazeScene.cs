@@ -80,6 +80,7 @@ namespace Assignment3.Scenes
         public override void draw(SpriteBatch sb)
         {
             // Reset the render state
+            BaseGame.instance.GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1.0f, 0);
             BaseGame.instance.GraphicsDevice.BlendState = BlendState.Opaque;
             BaseGame.instance.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             BaseGame.instance.GraphicsDevice.SamplerStates[0] = SamplerState.LinearWrap;
