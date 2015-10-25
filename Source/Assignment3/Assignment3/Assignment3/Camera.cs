@@ -175,8 +175,8 @@ namespace Assignment3
                     deltaY = curMS.Y - (VPH / 2);
 
                     //smooths mouse movement; creates rotation
-                    mouseRotationBuffer.X -= 0.01f * deltaX * DeltaTime;
-                    mouseRotationBuffer.Y -= 0.01f * deltaY * DeltaTime;
+                    mouseRotationBuffer.X -= 0.045f * deltaX * DeltaTime;
+                    mouseRotationBuffer.Y -= 0.045f * deltaY * DeltaTime;
 
                     if (mouseRotationBuffer.Y < MathHelper.ToRadians(-75f))
                     {

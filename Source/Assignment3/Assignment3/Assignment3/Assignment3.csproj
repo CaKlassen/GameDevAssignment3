@@ -60,6 +60,7 @@
     <Compile Include="Camera.cs" />
     <Compile Include="Entities\Floor.cs" />
     <Compile Include="Entities\Exit.cs" />
+    <Compile Include="Entities\Player.cs" />
     <Compile Include="Entities\Wall.cs" />
     <Compile Include="Entities\Entity.cs" />
     <Compile Include="MazeBuilder.cs" />

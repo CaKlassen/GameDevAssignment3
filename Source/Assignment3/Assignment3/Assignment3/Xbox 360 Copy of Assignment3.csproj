@@ -54,6 +54,7 @@
     <Compile Include="Entities\Entity.cs" />
     <Compile Include="Entities\Exit.cs" />
     <Compile Include="Entities\Floor.cs" />
+    <Compile Include="Entities\Player.cs" />
     <Compile Include="Entities\Wall.cs" />
     <Compile Include="MazeBuilder.cs" />
     <Compile Include="MazeCommunication.cs" />
