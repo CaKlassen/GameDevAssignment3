@@ -24,6 +24,7 @@ namespace Assignment3
 
         private int VPH;
         private int VPW;
+        private float FOV = 90f;
         private float AspectRatio;
         private Boolean GhostMode;
 
@@ -85,7 +86,7 @@ namespace Assignment3
         public Camera(Vector3 position, Vector3 rotation, float speed, float aspectRatio, int VPH, int VPW)
         {
             cameraSpeed = speed;
-            Projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(45f), aspectRatio, 0.05f, 1000f);
+            Projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(FOV), aspectRatio, 0.05f, 1000f);
             walkThroughWalls = false;
 
             this.VPH = VPH;
