@@ -23,13 +23,17 @@ namespace Assignment3.Scenes
         public static MazeScene instance;
 
         public Camera camera;
+        public Player mazeRunner;
         private BasicEffect effect;
         
         private float AspectRatio;
         
-        private List<Entity> collideList = new List<Entity>();
+        public List<Entity> collideList = new List<Entity>();
         private bool[,] rawMaze;
         private Floor floor;
+
+        private KeyboardState prevKB;
+        private GamePadState prevGP;
 
 
         public MazeScene()
@@ -57,6 +61,14 @@ namespace Assignment3.Scenes
             camera = new Camera(new Vector3(startPos.X * 4, 2f, startPos.Y * 4), new Vector3(0f, 180f, 0f), 10f, AspectRatio,
                 BaseGame.instance.GraphicsDevice.Viewport.Height, BaseGame.instance.GraphicsDevice.Viewport.Width);
 
+            mazeRunner = new Player();
+            mazeRunner.Load(content);
+
+            prevKB = Keyboard.GetState();
+
+            if(GamePad.GetState(PlayerIndex.One).IsConnected)
+                prevGP = GamePad.GetState(PlayerIndex.One);
+
             effect = new BasicEffect(BaseGame.instance.GraphicsDevice);
         }
 
@@ -68,6 +80,30 @@ namespace Assignment3.Scenes
                 BaseGame.instance.changeScene(SceneType.MENU);
             }
 
+            //turn walking through walls on/off
+            if (!gamepad.IsConnected)//no controller
+            {
+                if (keyboard.IsKeyDown(Keys.P) && !prevKB.IsKeyDown(Keys.P))
+                {
+                    if (camera.walkThroughWalls)
+                        camera.walkThroughWalls = false;
+                    else
+                        camera.walkThroughWalls = true;
+                }
+            }
+            else
+            {
+                if(gamepad.IsButtonDown(Buttons.Y) && !prevGP.IsButtonDown(Buttons.Y))
+                {
+                    if (camera.walkThroughWalls)
+                        camera.walkThroughWalls = false;
+                    else
+                        camera.walkThroughWalls = true;
+                }
+            }
+
+
+            mazeRunner.update(gameTime, gamepad, keyboard);
             camera.Update(gameTime);
 
             // Update the model list

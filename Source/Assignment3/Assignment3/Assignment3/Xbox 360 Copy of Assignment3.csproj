@@ -63,6 +63,7 @@
     <Compile Include="Scenes\MazeScene.cs" />
     <Compile Include="Scenes\MenuScene.cs" />
     <Compile Include="Scenes\Scene.cs" />
+    <Compile Include="Utilities\PhysicsUtil.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Game.ico" />

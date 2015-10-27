@@ -17,7 +17,7 @@ namespace Assignment3.Entities
     {
         public static int WALL_LENGTH = 200;
 
-        private Model model;
+        public Model model;
         private Vector3 pos;
 
         private float scale = 0.02f;
@@ -72,6 +72,11 @@ namespace Assignment3.Entities
                 // Draw the mesh, using the effects set above.
                 mesh.Draw();
             }
+        }
+
+        public Vector3 getPosition()
+        {
+            return pos;
         }
     }
 }
