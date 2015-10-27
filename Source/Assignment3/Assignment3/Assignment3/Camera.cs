@@ -4,6 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Assignment3.Utilities;
+using Assignment3.Scenes;
+using Assignment3.Entities;
 
 namespace Assignment3
 {
@@ -22,9 +25,16 @@ namespace Assignment3
         private int VPH;
         private int VPW;
         private float AspectRatio;
+        private Boolean GhostMode;
 
 
         //properties
+
+        public Boolean walkThroughWalls
+        {
+            get { return GhostMode; }
+            set { GhostMode = value; }
+        }
 
         public Vector3 Position
         {
@@ -76,6 +86,7 @@ namespace Assignment3
         {
             cameraSpeed = speed;
             Projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(45f), aspectRatio, 0.05f, 1000f);
+            walkThroughWalls = false;
 
             this.VPH = VPH;
             this.VPW = VPW;
@@ -93,6 +104,9 @@ namespace Assignment3
         {
             Position = Pos;
             Rotation = Rot;
+            //set player collision model position
+            if(MazeScene.instance.mazeRunner != null)
+                MazeScene.instance.mazeRunner.position = Position;
         }
 
         //update look at
@@ -108,16 +122,38 @@ namespace Assignment3
             LookAt = cameraPos + LookAtOffset;
         }
 
-        //Move camera
-        public void Move(Vector3 amount)
+        //preview movement for collisions
+        private Vector3 PreviewMove(Vector3 amount)
         {
             Matrix rotate = Matrix.CreateRotationY(cameraRot.Y);
             Vector3 movement = new Vector3(amount.X, amount.Y, amount.Z);
             movement = Vector3.Transform(movement, rotate);
 
-            MoveTo((cameraPos + movement), Rotation);
+            return cameraPos + movement;
+
+        }
+
+        //Move camera
+        public void Move(Vector3 amount)
+        {
+            if (!walkThroughWalls)//if walking through walls is off
+            {
+                //set player collision model to the preview position
+                MazeScene.instance.mazeRunner.position = PreviewMove(amount);
+                //test collision w/ preview move here
+                if (!PhysicsUtil.CheckCollision(MazeScene.instance.mazeRunner, MazeScene.instance.collideList))//if not colliding with wall
+                {
+                    MoveTo(PreviewMove(amount), Rotation);
+                }
+            }else
+            {
+                //else if walking through walls if on; just move
+                MoveTo(PreviewMove(amount), Rotation);
+            }
         }
         
+
+
         //update method
         public void Update(GameTime gameTime)
         {
