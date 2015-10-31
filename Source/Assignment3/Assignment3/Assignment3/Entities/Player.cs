@@ -25,7 +25,7 @@ namespace Assignment3.Entities
             playerModel = cm.Load<Model>("Models/Player");
         }
 
-        public override void draw(SpriteBatch sb)
+        public override void draw(SpriteBatch sb, Effect effect)
         {
             //nothing needed
         }
@@ -35,6 +35,8 @@ namespace Assignment3.Entities
             if (playerModel != null)//don't do anything if the model is null
             {
                 // Copy any parent transforms.
+                Vector3 camRot = MazeScene.instance.camera.Rotation;
+                Matrix worldMatrix = Matrix.CreateScale(0.1f, 0.1f, 0.1f) * Matrix.CreateRotationY(camRot.Y) * Matrix.CreateTranslation(position);
                 Matrix[] transforms = new Matrix[playerModel.Bones.Count];
                 playerModel.CopyAbsoluteBoneTransformsTo(transforms);
 
@@ -43,14 +45,14 @@ namespace Assignment3.Entities
                 {
 
                     // This is where the mesh orientation is set, as well as our camera and projection.
-                    foreach (BasicEffect effect in mesh.Effects)
+                    foreach (Effect currentEffect in mesh.Effects)
                     {
                         //effect.EnableDefaultLighting();//lighting
-                        Vector3 camRot = MazeScene.instance.camera.Rotation;
-                        effect.World = transforms[mesh.ParentBone.Index] * Matrix.CreateScale(0.1f, 0.1f, 0.1f) * Matrix.CreateRotationY(camRot.Y)
-                            * Matrix.CreateTranslation(position);
-                        effect.View = MazeScene.instance.camera.View;
-                        effect.Projection = MazeScene.instance.camera.Projection;
+
+                        currentEffect.Parameters["World"].SetValue(transforms[mesh.ParentBone.Index] * worldMatrix);
+                           
+                        //effect.Parameters["View"].SetValue(MazeScene.instance.camera.View);
+                        //effect.Parameters["Projection"].SetValue(MazeScene.instance.camera.Projection);
                     }
                     // Draw the mesh, using the effects set above.
                     //mesh.Draw();

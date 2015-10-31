@@ -37,25 +37,24 @@ namespace Assignment3.Entities
 
         }
 
-        public override void draw(SpriteBatch sb)
+        public override void draw(SpriteBatch sb, Effect effect)
         {
             // Copy any parent transforms.
+            Matrix worldMatrix = Matrix.CreateScale(scale) * Matrix.CreateTranslation(pos);
             Matrix[] transforms = new Matrix[model.Bones.Count];
             model.CopyAbsoluteBoneTransformsTo(transforms);
 
             // Draw the model. A model can have multiple meshes, so loop.
             foreach (ModelMesh mesh in model.Meshes)
             {
-
                 // This is where the mesh orientation is set, as well as our camera and projection.
-                foreach (BasicEffect effect in mesh.Effects)
+                foreach (ModelMeshPart part in mesh.MeshParts)
                 {
-                    effect.EnableDefaultLighting();//lighting
+                    effect.Parameters["World"].SetValue(transforms[mesh.ParentBone.Index] * worldMatrix);
+                    effect.Parameters["View"].SetValue(MazeScene.instance.camera.View);
+                    effect.Parameters["Projection"].SetValue(MazeScene.instance.camera.Projection);
 
-                    effect.World = transforms[mesh.ParentBone.Index] * Matrix.CreateScale(scale)
-                        * Matrix.CreateTranslation(pos);
-                    effect.View = MazeScene.instance.camera.View;
-                    effect.Projection = MazeScene.instance.camera.Projection;
+                    
                 }
                 // Draw the mesh, using the effects set above.
                 mesh.Draw();

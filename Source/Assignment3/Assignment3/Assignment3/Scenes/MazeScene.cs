@@ -24,7 +24,7 @@ namespace Assignment3.Scenes
 
         public Camera camera;
         public Player mazeRunner;
-        private BasicEffect effect;
+        //private BasicEffect effect;
         
         private float AspectRatio;
         
@@ -35,6 +35,12 @@ namespace Assignment3.Scenes
         private KeyboardState prevKB;
         private GamePadState prevGP;
 
+        public Matrix Projection;
+        public Matrix View;
+        public Matrix World;
+
+        public Effect HLSLeffect;
+
 
         public MazeScene()
         {
@@ -43,6 +49,8 @@ namespace Assignment3.Scenes
 
         public override void onLoad(ContentManager content)
         {
+            HLSLeffect = content.Load<Effect>("Effects/Shader");
+
             MazeDifficulty difficulty = MazeCommunication.getDifficulty();
 
             // Generate the maze
@@ -64,12 +72,16 @@ namespace Assignment3.Scenes
             mazeRunner = new Player();
             mazeRunner.Load(content);
 
+            
+
             prevKB = Keyboard.GetState();
 
-            if(GamePad.GetState(PlayerIndex.One).IsConnected)
+            World = Matrix.CreateTranslation(0, 0, 0);
+
+            if (GamePad.GetState(PlayerIndex.One).IsConnected)
                 prevGP = GamePad.GetState(PlayerIndex.One);
 
-            effect = new BasicEffect(BaseGame.instance.GraphicsDevice);
+            //effect = new BasicEffect(BaseGame.instance.GraphicsDevice);
         }
 
         public override void update(GameTime gameTime, GamePadState gamepad, KeyboardState keyboard)
@@ -121,12 +133,16 @@ namespace Assignment3.Scenes
             BaseGame.instance.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             BaseGame.instance.GraphicsDevice.SamplerStates[0] = SamplerState.LinearWrap;
 
-            floor.draw(sb);
+            HLSLeffect.CurrentTechnique = HLSLeffect.Techniques["Ambient"];
+            HLSLeffect.Parameters["AmbientColor"].SetValue(Color.Red.ToVector4());
+            HLSLeffect.Parameters["AmbientIntensity"].SetValue(0.5f);
+
+            floor.draw(sb, HLSLeffect);
 
             // Render the model list
             foreach (Entity e in collideList)
             {
-                e.draw(sb);
+                e.draw(sb, HLSLeffect);
             }
         }
     }
