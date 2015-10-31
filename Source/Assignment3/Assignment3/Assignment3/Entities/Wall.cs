@@ -29,7 +29,22 @@ namespace Assignment3.Entities
             pos.Y *= (WALL_LENGTH * scale);
             pos.Z *= (WALL_LENGTH * scale);
 
-            model = content.Load<Model>("Models/Wall");
+            model = loadModelEffect(content, "Models/Wall");
+        }
+
+        /// <summary>
+        /// change the default effect of the model to the Shader Effect.
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="ModelName"></param>
+        /// <returns></returns>
+        private Model loadModelEffect(ContentManager content, string ModelName)
+        {
+            Model newModel = content.Load<Model>(ModelName);
+            foreach (ModelMesh mesh in newModel.Meshes)
+                foreach (ModelMeshPart meshPart in mesh.MeshParts)
+                    meshPart.Effect = MazeScene.instance.HLSLeffect.Clone();
+            return newModel;
         }
         
         public override void update(GameTime gameTime, GamePadState gamepad, KeyboardState keyboard)
@@ -37,37 +52,24 @@ namespace Assignment3.Entities
 
         }
 
-        public override void draw(SpriteBatch sb)
+        public override void draw(SpriteBatch sb, Effect effect)
         {
             // Copy any parent transforms.
+            Matrix worldMatrix = Matrix.CreateScale(scale) * Matrix.CreateTranslation(pos);
             Matrix[] transforms = new Matrix[model.Bones.Count];
             model.CopyAbsoluteBoneTransformsTo(transforms);
 
             // Draw the model. A model can have multiple meshes, so loop.
             foreach (ModelMesh mesh in model.Meshes)
             {
-
                 // This is where the mesh orientation is set, as well as our camera and projection.
-                foreach (BasicEffect effect in mesh.Effects)
+                foreach (Effect currentEffect in mesh.Effects)
                 {
-                    effect.EnableDefaultLighting();//lighting
+                    currentEffect.Parameters["World"].SetValue(transforms[mesh.ParentBone.Index] * worldMatrix);
+                    currentEffect.Parameters["View"].SetValue(MazeScene.instance.camera.View);
+                    currentEffect.Parameters["Projection"].SetValue(MazeScene.instance.camera.Projection);
 
-                    //effect.DirectionalLight0.Enabled = true;
-                    //effect.DirectionalLight0.DiffuseColor = Color.Red.ToVector3();
-                    //effect.DirectionalLight0.Direction = Vector3.Normalize(new Vector3(-1, -1.5f, 0));
-
-                    //effect.DirectionalLight1.Enabled = true;
-                    //effect.DirectionalLight1.DiffuseColor = Color.Red.ToVector3();
-                    //effect.DirectionalLight1.Direction = Vector3.Normalize(new Vector3(1, -1.5f, -1));
-
-                    //effect.DirectionalLight2.Enabled = true;
-                    //effect.DirectionalLight2.DiffuseColor = Color.Red.ToVector3();
-                    //effect.DirectionalLight2.Direction = Vector3.Normalize(new Vector3(-1, -1.5f, -1));
-
-                    effect.World = transforms[mesh.ParentBone.Index] * Matrix.CreateScale(scale)
-                        * Matrix.CreateTranslation(pos);
-                    effect.View = MazeScene.instance.camera.View;
-                    effect.Projection = MazeScene.instance.camera.Projection;
+           
                 }
                 // Draw the mesh, using the effects set above.
                 mesh.Draw();

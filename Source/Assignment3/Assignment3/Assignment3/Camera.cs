@@ -100,6 +100,11 @@ namespace Assignment3
             prevMS = Mouse.GetState();
         }
 
+        public Vector3 getViewVector()
+        {
+            return LookAt - cameraPos;
+        }
+
         //set camera Pos and Rot
         private void MoveTo(Vector3 Pos, Vector3 Rot)
         {

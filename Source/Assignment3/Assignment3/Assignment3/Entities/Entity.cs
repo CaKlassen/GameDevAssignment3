@@ -21,6 +21,6 @@ namespace Assignment3.Entities
         
         public abstract void update(GameTime gameTime, GamePadState gamepad, KeyboardState keyboard);
 
-        public abstract void draw(SpriteBatch sb);
+        public abstract void draw(SpriteBatch sb, Effect effect);
     }
 }
