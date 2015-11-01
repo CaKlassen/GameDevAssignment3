@@ -267,8 +267,8 @@ namespace Assignment3
                 float rotX = gps.ThumbSticks.Right.X;
                 float rotY = gps.ThumbSticks.Right.Y * -1;
 
-                RS.X -= rotX * DeltaTime;
-                RS.Y -= rotY * DeltaTime;
+                RS.X -= 4.045f * rotX * DeltaTime;
+                RS.Y -= 4.045f * rotY * DeltaTime;
 
                 if (RS.Y < MathHelper.ToRadians(-75f))
                 {
