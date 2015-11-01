@@ -72,6 +72,11 @@ namespace Assignment3
             }
         }
 
+        public Vector3 getLookAt()
+        {
+            return LookAt;
+        }
+
 
         /// <summary>
         /// Constructor.

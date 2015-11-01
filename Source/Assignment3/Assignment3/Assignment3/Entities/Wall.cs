@@ -18,6 +18,7 @@ namespace Assignment3.Entities
         public static int WALL_LENGTH = 200;
 
         public Model model;
+        private Texture2D WallTex;
         private Vector3 pos;
 
         private float scale = 0.02f;
@@ -32,6 +33,7 @@ namespace Assignment3.Entities
             pos.Z *= (WALL_LENGTH * scale);
 
             model = content.Load<Model>("Models/Wall");
+            WallTex = content.Load<Texture2D>("Models/Wall-UVMap");
             //model = loadModelEffect(content, "Models/Wall");
             //objectWorld = Matrix.CreateScale(scale) * Matrix.CreateTranslation(pos);
         }
@@ -58,6 +60,8 @@ namespace Assignment3.Entities
 
         public override void draw(SpriteBatch sb, Effect effect)
         {
+            Vector3 viewVector = Vector3.Transform(MazeScene.instance.camera.getLookAt() - MazeScene.instance.camera.Position, Matrix.CreateRotationY(0));
+            viewVector.Normalize();
             // Copy any parent transforms.
             Matrix worldMatrix = Matrix.CreateScale(scale) * Matrix.CreateTranslation(pos);
 
@@ -73,6 +77,8 @@ namespace Assignment3.Entities
                     effect.Parameters["World"].SetValue(mesh.ParentBone.Transform * worldMatrix);
                     effect.Parameters["View"].SetValue(MazeScene.instance.camera.View);
                     effect.Parameters["Projection"].SetValue(MazeScene.instance.camera.Projection);
+                    effect.Parameters["ViewVector"].SetValue(viewVector);
+                    effect.Parameters["ModelTexture"].SetValue(WallTex);
 
                     Matrix worldInverseTransposeMatrix = Matrix.Transpose(Matrix.Invert(mesh.ParentBone.Transform * worldMatrix));
                     effect.Parameters["WorldInverseTranspose"].SetValue(worldInverseTransposeMatrix);
