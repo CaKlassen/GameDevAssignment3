@@ -19,6 +19,7 @@ namespace Assignment3.Entities
 
         public Model model;
         private Vector3 pos;
+        private Texture2D texture;
 
         private float scale = 0.02f;
 
@@ -39,6 +40,9 @@ namespace Assignment3.Entities
 
         public override void draw(SpriteBatch sb, Effect effect)
         {
+            effect.CurrentTechnique = effect.Techniques["NoTexture"];
+            Vector3 viewVector = Vector3.Transform(MazeScene.instance.camera.getLookAt() - MazeScene.instance.camera.Position, Matrix.CreateRotationY(0));
+            viewVector.Normalize();
             // Copy any parent transforms.
             Matrix worldMatrix = Matrix.CreateScale(scale) * Matrix.CreateTranslation(pos);
 
@@ -54,6 +58,7 @@ namespace Assignment3.Entities
                     effect.Parameters["World"].SetValue(mesh.ParentBone.Transform * worldMatrix);
                     effect.Parameters["View"].SetValue(MazeScene.instance.camera.View);
                     effect.Parameters["Projection"].SetValue(MazeScene.instance.camera.Projection);
+                    effect.Parameters["ViewVector"].SetValue(viewVector);
 
                     Matrix worldInverseTransposeMatrix = Matrix.Transpose(Matrix.Invert(mesh.ParentBone.Transform * worldMatrix));
                     effect.Parameters["WorldInverseTranspose"].SetValue(worldInverseTransposeMatrix);
@@ -61,6 +66,7 @@ namespace Assignment3.Entities
                 // Draw the mesh, using the effects set above.
                 mesh.Draw();
             }
+            effect.CurrentTechnique = effect.Techniques["ShaderTech"];
         }
         public Vector3 getPosition()
         {
