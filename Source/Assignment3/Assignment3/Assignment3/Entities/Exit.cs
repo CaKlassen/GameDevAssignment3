@@ -41,8 +41,6 @@ namespace Assignment3.Entities
         {
             // Copy any parent transforms.
             Matrix worldMatrix = Matrix.CreateScale(scale) * Matrix.CreateTranslation(pos);
-            Matrix[] transforms = new Matrix[model.Bones.Count];
-            model.CopyAbsoluteBoneTransformsTo(transforms);
 
             // Draw the model. A model can have multiple meshes, so loop.
             foreach (ModelMesh mesh in model.Meshes)
@@ -50,11 +48,15 @@ namespace Assignment3.Entities
                 // This is where the mesh orientation is set, as well as our camera and projection.
                 foreach (ModelMeshPart part in mesh.MeshParts)
                 {
-                    effect.Parameters["World"].SetValue(transforms[mesh.ParentBone.Index] * worldMatrix);
+                    part.Effect = effect;
+                    effect.Parameters["AmbientColor"].SetValue(Color.LightYellow.ToVector4());
+                    effect.Parameters["AmbientIntensity"].SetValue(0.35f);
+                    effect.Parameters["World"].SetValue(mesh.ParentBone.Transform * worldMatrix);
                     effect.Parameters["View"].SetValue(MazeScene.instance.camera.View);
                     effect.Parameters["Projection"].SetValue(MazeScene.instance.camera.Projection);
 
-                    
+                    Matrix worldInverseTransposeMatrix = Matrix.Transpose(Matrix.Invert(mesh.ParentBone.Transform * worldMatrix));
+                    effect.Parameters["WorldInverseTranspose"].SetValue(worldInverseTransposeMatrix);
                 }
                 // Draw the mesh, using the effects set above.
                 mesh.Draw();

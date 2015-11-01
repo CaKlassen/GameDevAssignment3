@@ -133,13 +133,13 @@ namespace Assignment3.Scenes
             BaseGame.instance.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             BaseGame.instance.GraphicsDevice.SamplerStates[0] = SamplerState.LinearWrap;
 
-            HLSLeffect.CurrentTechnique = HLSLeffect.Techniques["Ambient"];
-            HLSLeffect.Parameters["AmbientColor"].SetValue(Color.Red.ToVector4());
-            HLSLeffect.Parameters["AmbientIntensity"].SetValue(0.5f);
+            HLSLeffect.CurrentTechnique = HLSLeffect.Techniques["ShaderTech"];
+            //HLSLeffect.Parameters["AmbientColor"].SetValue(Color.Red.ToVector4());
+            //HLSLeffect.Parameters["AmbientIntensity"].SetValue(0.35f);
 
             floor.draw(sb, HLSLeffect);
 
-            // Render the model list
+            //// Render the model list
             foreach (Entity e in collideList)
             {
                 e.draw(sb, HLSLeffect);

@@ -22,6 +22,8 @@ namespace Assignment3.Entities
 
         private float scale = 0.02f;
 
+        Matrix objectWorld;
+
         public Wall(ContentManager content, Vector3 position)
         {
             pos = position;
@@ -29,7 +31,9 @@ namespace Assignment3.Entities
             pos.Y *= (WALL_LENGTH * scale);
             pos.Z *= (WALL_LENGTH * scale);
 
-            model = loadModelEffect(content, "Models/Wall");
+            model = content.Load<Model>("Models/Wall");
+            //model = loadModelEffect(content, "Models/Wall");
+            //objectWorld = Matrix.CreateScale(scale) * Matrix.CreateTranslation(pos);
         }
 
         /// <summary>
@@ -38,14 +42,14 @@ namespace Assignment3.Entities
         /// <param name="content"></param>
         /// <param name="ModelName"></param>
         /// <returns></returns>
-        private Model loadModelEffect(ContentManager content, string ModelName)
-        {
-            Model newModel = content.Load<Model>(ModelName);
-            foreach (ModelMesh mesh in newModel.Meshes)
-                foreach (ModelMeshPart meshPart in mesh.MeshParts)
-                    meshPart.Effect = MazeScene.instance.HLSLeffect.Clone();
-            return newModel;
-        }
+        //private Model loadModelEffect(ContentManager content, string ModelName)
+        //{
+        //    Model newModel = content.Load<Model>(ModelName);
+        //    foreach (ModelMesh mesh in newModel.Meshes)
+        //        foreach (ModelMeshPart meshPart in mesh.MeshParts)
+        //            meshPart.Effect = MazeScene.instance.HLSLeffect.Clone();
+        //    return newModel;
+        //}
         
         public override void update(GameTime gameTime, GamePadState gamepad, KeyboardState keyboard)
         {
@@ -56,20 +60,22 @@ namespace Assignment3.Entities
         {
             // Copy any parent transforms.
             Matrix worldMatrix = Matrix.CreateScale(scale) * Matrix.CreateTranslation(pos);
-            Matrix[] transforms = new Matrix[model.Bones.Count];
-            model.CopyAbsoluteBoneTransformsTo(transforms);
 
             // Draw the model. A model can have multiple meshes, so loop.
             foreach (ModelMesh mesh in model.Meshes)
             {
                 // This is where the mesh orientation is set, as well as our camera and projection.
-                foreach (Effect currentEffect in mesh.Effects)
+                foreach (ModelMeshPart part in mesh.MeshParts)
                 {
-                    currentEffect.Parameters["World"].SetValue(transforms[mesh.ParentBone.Index] * worldMatrix);
-                    currentEffect.Parameters["View"].SetValue(MazeScene.instance.camera.View);
-                    currentEffect.Parameters["Projection"].SetValue(MazeScene.instance.camera.Projection);
+                    part.Effect = effect;
+                    effect.Parameters["AmbientColor"].SetValue(Color.Red.ToVector4());
+                    effect.Parameters["AmbientIntensity"].SetValue(0.35f);
+                    effect.Parameters["World"].SetValue(mesh.ParentBone.Transform * worldMatrix);
+                    effect.Parameters["View"].SetValue(MazeScene.instance.camera.View);
+                    effect.Parameters["Projection"].SetValue(MazeScene.instance.camera.Projection);
 
-           
+                    Matrix worldInverseTransposeMatrix = Matrix.Transpose(Matrix.Invert(mesh.ParentBone.Transform * worldMatrix));
+                    effect.Parameters["WorldInverseTranspose"].SetValue(worldInverseTransposeMatrix);
                 }
                 // Draw the mesh, using the effects set above.
                 mesh.Draw();

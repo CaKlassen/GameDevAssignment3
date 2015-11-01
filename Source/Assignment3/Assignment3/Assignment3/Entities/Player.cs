@@ -37,30 +37,8 @@ namespace Assignment3.Entities
                 // Copy any parent transforms.
                 Vector3 camRot = MazeScene.instance.camera.Rotation;
                 Matrix worldMatrix = Matrix.CreateScale(0.1f, 0.1f, 0.1f) * Matrix.CreateRotationY(camRot.Y) * Matrix.CreateTranslation(position);
-                Matrix[] transforms = new Matrix[playerModel.Bones.Count];
-                playerModel.CopyAbsoluteBoneTransformsTo(transforms);
-
-                // Draw the model. A model can have multiple meshes, so loop.
-                foreach (ModelMesh mesh in playerModel.Meshes)
-                {
-
-                    // This is where the mesh orientation is set, as well as our camera and projection.
-                    foreach (Effect currentEffect in mesh.Effects)
-                    {
-                        //effect.EnableDefaultLighting();//lighting
-
-                        currentEffect.Parameters["World"].SetValue(transforms[mesh.ParentBone.Index] * worldMatrix);
-                           
-                        //effect.Parameters["View"].SetValue(MazeScene.instance.camera.View);
-                        //effect.Parameters["Projection"].SetValue(MazeScene.instance.camera.Projection);
-                    }
-                    // Draw the mesh, using the effects set above.
-                    //mesh.Draw();
-                }
             }
 
-            //update model position w/ camera
-            //position = MazeScene.instance.camera.Position;
         }
 
         public Vector3 getPosition()

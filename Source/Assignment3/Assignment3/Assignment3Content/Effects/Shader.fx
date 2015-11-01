@@ -10,20 +10,26 @@ float3 DiffuseLightDirection = float3(1, 0, 0);
 float4 DiffuseColor = float4(1, 1, 1, 1);
 float DiffuseIntensity = 1.0;
 
+float Shininess = 100;//lower for less reflective objects (100-150 for metal)
+float4 SpecularColor = float4(1, 1, 1, 1);
+float SpecularIntensity = 1;//lower intensity means dimmer highlights
+float3 ViewVector = float3(1, 0, 0);//direction of camera eye
+
 
 struct VertexShaderInput
 {
 	float4 Position : POSITION0;
-	//float4 Normal : NORMAL0;
+	float4 Normal : NORMAL0;
 };
 
 struct VertexShaderOutput
 {
 	float4 Position : POSITION0;
-	//float4 Color : COLOR0;
+	float4 Color : COLOR0;
+	float3 Normal : TEXCOORD0;
 };
 
-//AMBIENT
+
 VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 {
 	VertexShaderOutput output;
@@ -32,16 +38,29 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 	float4 viewPosition = mul(worldPosition, View);
 	output.Position = mul(viewPosition, Projection);
 
+	float4 normal = mul(input.Normal, WorldInverseTranspose);
+	float lightIntensity = dot(normal, DiffuseLightDirection);
+	output.Color = saturate(DiffuseColor * DiffuseIntensity * lightIntensity);
+	output.Normal = normal;
+
 	return output;
 }
 
 float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 {
-	return AmbientColor * AmbientIntensity;
+	float3 light = normalize(DiffuseLightDirection);
+	float3 normal = normalize(input.Normal);
+	float3 r = normalize(2 * dot(light, normal) * normal - light);
+	float3 v = normalize(mul(normalize(ViewVector), World));
+
+	float dotProduct = dot(r, v);
+	float4 specular = SpecularIntensity * SpecularColor * max(pow(dotProduct, Shininess), 0) * length(input.Color);
+
+	return saturate(input.Color + AmbientColor * AmbientIntensity + specular);
 }
 
-//Ambient technique
-technique Ambient
+
+technique ShaderTech
 {
 	pass Pass1
 	{
@@ -49,3 +68,4 @@ technique Ambient
 		PixelShader = compile ps_2_0 PixelShaderFunction();
 	}
 }
+
