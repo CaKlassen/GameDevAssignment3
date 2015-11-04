@@ -78,7 +78,7 @@ namespace Assignment3.Scenes
 
             prevKB = Keyboard.GetState();
 
-            World = Matrix.CreateTranslation(0, 0, 0);
+            World = Matrix.Identity;
 
             if (GamePad.GetState(PlayerIndex.One).IsConnected)
                 prevGP = GamePad.GetState(PlayerIndex.One);
@@ -210,6 +210,10 @@ namespace Assignment3.Scenes
 
             HLSLeffect.Parameters["AmbientColor"].SetValue(Color.White.ToVector4());
             HLSLeffect.Parameters["AmbientIntensity"].SetValue(0.1f);
+
+            HLSLeffect.Parameters["spotlightPosition"].SetValue(camera.Position);
+            HLSLeffect.Parameters["spotlightDirection"].SetValue(Vector3.Normalize(camera.getLookAt() - camera.Position));
+            HLSLeffect.Parameters["lightColor"].SetValue(Color.White.ToVector3());
 
             HLSLeffect.Parameters["View"].SetValue(camera.View);
             HLSLeffect.Parameters["Projection"].SetValue(camera.Projection);
