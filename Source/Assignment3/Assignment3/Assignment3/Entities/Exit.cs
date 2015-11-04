@@ -31,6 +31,7 @@ namespace Assignment3.Entities
             pos.Z *= (WALL_LENGTH * scale);
 
             model = content.Load<Model>("Models/Player");
+            texture = content.Load<Texture2D>("Models/StoneFloor");
         }
         
         public override void update(GameTime gameTime, GamePadState gamepad, KeyboardState keyboard)
@@ -40,9 +41,6 @@ namespace Assignment3.Entities
 
         public override void draw(SpriteBatch sb, Effect effect)
         {
-            effect.CurrentTechnique = effect.Techniques["NoTexture"];
-            Vector3 viewVector = Vector3.Transform(MazeScene.instance.camera.getLookAt() - MazeScene.instance.camera.Position, Matrix.CreateRotationY(0));
-            viewVector.Normalize();
             // Copy any parent transforms.
             Matrix worldMatrix = Matrix.CreateScale(scale) * Matrix.CreateTranslation(pos);
 
@@ -53,12 +51,9 @@ namespace Assignment3.Entities
                 foreach (ModelMeshPart part in mesh.MeshParts)
                 {
                     part.Effect = effect;
-                    effect.Parameters["AmbientColor"].SetValue(Color.LightYellow.ToVector4());
-                    effect.Parameters["AmbientIntensity"].SetValue(0.35f);
                     effect.Parameters["World"].SetValue(mesh.ParentBone.Transform * worldMatrix);
-                    effect.Parameters["View"].SetValue(MazeScene.instance.camera.View);
-                    effect.Parameters["Projection"].SetValue(MazeScene.instance.camera.Projection);
-                    effect.Parameters["ViewVector"].SetValue(viewVector);
+                    effect.Parameters["ModelTexture"].SetValue(texture);
+
 
                     Matrix worldInverseTransposeMatrix = Matrix.Transpose(Matrix.Invert(mesh.ParentBone.Transform * worldMatrix));
                     effect.Parameters["WorldInverseTranspose"].SetValue(worldInverseTransposeMatrix);
@@ -66,7 +61,6 @@ namespace Assignment3.Entities
                 // Draw the mesh, using the effects set above.
                 mesh.Draw();
             }
-            effect.CurrentTechnique = effect.Techniques["ShaderTech"];
         }
         public Vector3 getPosition()
         {

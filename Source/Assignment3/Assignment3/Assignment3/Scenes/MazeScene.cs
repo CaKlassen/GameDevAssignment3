@@ -133,9 +133,18 @@ namespace Assignment3.Scenes
             BaseGame.instance.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             BaseGame.instance.GraphicsDevice.SamplerStates[0] = SamplerState.LinearWrap;
 
+            // Update the shader parameters
+            Vector3 viewVector = Vector3.Transform(camera.getLookAt() - camera.Position, Matrix.CreateRotationY(0));
+            viewVector.Normalize();
+
             HLSLeffect.CurrentTechnique = HLSLeffect.Techniques["ShaderTech"];
-            //HLSLeffect.Parameters["AmbientColor"].SetValue(Color.Red.ToVector4());
-            //HLSLeffect.Parameters["AmbientIntensity"].SetValue(0.35f);
+
+            HLSLeffect.Parameters["AmbientColor"].SetValue(Color.White.ToVector4());
+            HLSLeffect.Parameters["AmbientIntensity"].SetValue(0.1f);
+
+            HLSLeffect.Parameters["View"].SetValue(camera.View);
+            HLSLeffect.Parameters["Projection"].SetValue(camera.Projection);
+            HLSLeffect.Parameters["ViewVector"].SetValue(viewVector);
 
             floor.draw(sb, HLSLeffect);
 
