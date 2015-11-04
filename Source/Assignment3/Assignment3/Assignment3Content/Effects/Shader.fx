@@ -19,6 +19,11 @@ float4 SpecularColor = float4(1, 1, 1, 0.05);
 float SpecularIntensity = 0;//lower intensity means dimmer highlights
 float3 ViewVector = float3(1, 0, 0);//direction of camera eye
 
+//spotlight
+float spotlightPower = 10;
+float3 spotlightPosition;//camera position
+float3 spotlightDirection;//camera lookat-position (normalized)
+float3 lightColor;
 
 //Texture shading
 texture ModelTexture;
@@ -35,7 +40,7 @@ struct VertexShaderInput
 	float4 Position : POSITION0;
 	float4 Normal : NORMAL0;
 	//Texture shading
-	float2 TextureCoordinate : TEXCOORD0;
+	float3 TextureCoordinate : TEXCOORD0;
 };
 
 struct VertexShaderOutput
@@ -44,7 +49,7 @@ struct VertexShaderOutput
 	float4 Color : COLOR0;
 	float3 Normal : TEXCOORD0;
 	//Texture shading
-	float2 TextureCoordinate : TEXCOORD1;
+	float3 TextureCoordinate : TEXCOORD1;
 };
 
 
@@ -75,22 +80,57 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 
 float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 {
+	
 	float3 light = normalize(DiffuseLightDirection);
 	float3 normal = normalize(input.Normal);
 	float3 r = normalize(2 * dot(light, normal) * normal - light);
 	float3 v = normalize(mul(normalize(ViewVector), World));
 
+	//ambient
+	float4 ambient = AmbientColor * AmbientIntensity;//Ka = AmbientIntensity
+
 	float dotProduct = dot(r, v);
+
+	//specular
 	float4 specular = SpecularIntensity * SpecularColor * max(pow(dotProduct, Shininess), 0) * length(input.Color);
 
-
+	
 	//Texture shading
 	float4 textureColor = tex2D(textureSampler, input.TextureCoordinate);
 	textureColor.a = 1;
 
-	return saturate(textureColor * (input.Color) + AmbientColor * AmbientIntensity + specular);
+	return saturate(textureColor * (input.Color) + ambient + specular);
 }
 
+float4 PSspotlight(VertexShaderOutput input) : COLOR0
+{
+	float4 color = tex2D(textureSampler, input.TextureCoordinate);
+
+	//ambient
+	float3 ambient = AmbientColor * AmbientIntensity;//Ka = AmbientIntensity
+
+	//diffuse
+	float3 L = normalize(spotlightPosition - input.TextureCoordinate);
+	float diffuseLight = max(dot(input.Normal, L), 0);
+	float3 diffuse = DiffuseIntensity * lightColor * diffuseLight;
+
+	//specular
+	float3 V = normalize(spotlightPosition - input.TextureCoordinate);
+	float3 H = normalize(L + V);
+	float specularLight = pow(dot(input.Normal, H), SpecularIntensity);
+
+	if (diffuseLight <= 0)
+		specularLight = 0;
+	float3 specular = SpecularIntensity * lightColor * specularLight;
+
+	float spotlightScale = pow(max(dot(L, -spotlightDirection), 0), spotlightPower);
+
+	float3 light = ambient + (diffuse + specular) * spotlightScale;
+
+	color.rgb *= light;
+
+	return color;
+}
 
 // TECHNIQUE
 
@@ -100,5 +140,11 @@ technique ShaderTech
 	{
 		VertexShader = compile vs_2_0 VertexShaderFunction();
 		PixelShader = compile ps_2_0 PixelShaderFunction();
+	}
+
+	pass Pass2
+	{
+		VertexShader = compile vs_2_0 VertexShaderFunction();
+		PixelShader = compile ps_2_0 PSspotlight();
 	}
 }
