@@ -60,8 +60,6 @@ namespace Assignment3.Entities
 
         public override void draw(SpriteBatch sb, Effect effect)
         {
-            Vector3 viewVector = Vector3.Transform(MazeScene.instance.camera.getLookAt() - MazeScene.instance.camera.Position, Matrix.CreateRotationY(0));
-            viewVector.Normalize();
             // Copy any parent transforms.
             Matrix worldMatrix = Matrix.CreateScale(scale) * Matrix.CreateTranslation(pos);
 
@@ -72,12 +70,8 @@ namespace Assignment3.Entities
                 foreach (ModelMeshPart part in mesh.MeshParts)
                 {
                     part.Effect = effect;
-                    effect.Parameters["AmbientColor"].SetValue(Color.Red.ToVector4());
-                    effect.Parameters["AmbientIntensity"].SetValue(0.35f);
+
                     effect.Parameters["World"].SetValue(mesh.ParentBone.Transform * worldMatrix);
-                    effect.Parameters["View"].SetValue(MazeScene.instance.camera.View);
-                    effect.Parameters["Projection"].SetValue(MazeScene.instance.camera.Projection);
-                    effect.Parameters["ViewVector"].SetValue(viewVector);
                     effect.Parameters["ModelTexture"].SetValue(WallTex);
 
                     Matrix worldInverseTransposeMatrix = Matrix.Transpose(Matrix.Invert(mesh.ParentBone.Transform * worldMatrix));
