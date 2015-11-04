@@ -27,6 +27,7 @@ namespace Assignment3
         private float FOV = 90f;
         private float AspectRatio;
         private Boolean GhostMode;
+        private Matrix projection;
 
 
         //properties
@@ -62,6 +63,7 @@ namespace Assignment3
         {
             get;
             protected set;
+
         }
 
         public Matrix View
@@ -78,6 +80,16 @@ namespace Assignment3
         }
 
 
+        public void UpdateFOV(float FOV)
+        {
+            this.FOV = FOV;
+            Projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(this.FOV), AspectRatio, 0.05f, 1000f);
+        }
+
+        public float getFOV()
+        {
+            return FOV;
+        }
         /// <summary>
         /// Constructor.
         /// sets up the camera.
@@ -90,6 +102,7 @@ namespace Assignment3
         /// <param name="VPW">the game's ViewPort Width.</param>
         public Camera(Vector3 position, Vector3 rotation, float speed, float aspectRatio, int VPH, int VPW)
         {
+            AspectRatio = aspectRatio;
             cameraSpeed = speed;
             Projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(FOV), aspectRatio, 0.05f, 1000f);
             walkThroughWalls = false;
