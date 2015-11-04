@@ -33,6 +33,7 @@ namespace Assignment3.Entities
             pos.Z *= (WALL_LENGTH * scale);
 
             model = content.Load<Model>("Models/Wall");
+            //model = loadModelEffect(content, "Models/Wall");
             WallTex = content.Load<Texture2D>("Models/Wall-UVMap");
             //model = loadModelEffect(content, "Models/Wall");
             //objectWorld = Matrix.CreateScale(scale) * Matrix.CreateTranslation(pos);
@@ -52,7 +53,7 @@ namespace Assignment3.Entities
         //            meshPart.Effect = MazeScene.instance.HLSLeffect.Clone();
         //    return newModel;
         //}
-        
+
         public override void update(GameTime gameTime, GamePadState gamepad, KeyboardState keyboard)
         {
 
@@ -72,7 +73,7 @@ namespace Assignment3.Entities
                     part.Effect = effect;
 
                     effect.Parameters["World"].SetValue(mesh.ParentBone.Transform * worldMatrix);
-                    effect.Parameters["ModelTexture"].SetValue(WallTex);
+                    effect.Parameters["ModelTexture"].SetValue(WallTex);                   
 
                     Matrix worldInverseTransposeMatrix = Matrix.Transpose(Matrix.Invert(mesh.ParentBone.Transform * worldMatrix));
                     effect.Parameters["WorldInverseTranspose"].SetValue(worldInverseTransposeMatrix);

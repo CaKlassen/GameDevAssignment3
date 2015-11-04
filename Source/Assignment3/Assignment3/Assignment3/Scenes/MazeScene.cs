@@ -24,7 +24,8 @@ namespace Assignment3.Scenes
 
         public Camera camera;
         public Player mazeRunner;
-        //private BasicEffect effect;
+
+        private Vector3 MazeStartPos;
         
         private float AspectRatio;
         
@@ -59,6 +60,7 @@ namespace Assignment3.Scenes
 
             builder.generateWalls(content, collideList);
             Vector2 startPos = builder.getStartPos();
+            MazeStartPos = new Vector3(startPos.X * 4, 2f, startPos.Y * 4);
 
             // Create the floor
             Vector3 floorPos = new Vector3(rawMaze.GetLength(0) / 2f, 0, rawMaze.GetLength(0) / 2f);
@@ -95,6 +97,7 @@ namespace Assignment3.Scenes
             //turn walking through walls on/off
             if (!gamepad.IsConnected)//no controller
             {
+                //walking through walls feature
                 if (keyboard.IsKeyDown(Keys.P) && !prevKB.IsKeyDown(Keys.P))
                 {
                     if (camera.walkThroughWalls)
@@ -102,9 +105,42 @@ namespace Assignment3.Scenes
                     else
                         camera.walkThroughWalls = true;
                 }
+
+                //return to beginning of maze
+                if(keyboard.IsKeyDown(Keys.Home) && !prevKB.IsKeyDown(Keys.Home))
+                {
+                    camera.Position = MazeStartPos;
+                    camera.UpdateFOV(90f);
+                }
+
+                //zoom in
+                if(Mouse.GetState().LeftButton == ButtonState.Pressed)
+                {
+                    float fov = camera.getFOV();
+                    if(fov > 45f)
+                        fov--;
+       
+                    camera.UpdateFOV(fov);
+                }
+                //zoom out
+                if (Mouse.GetState().RightButton == ButtonState.Pressed)
+                {
+                    float fov = camera.getFOV();
+                    if(fov < 110f)
+                        fov++;
+                    
+                    camera.UpdateFOV(fov);
+                }
+
+                //reset back to original FOV
+                if(Mouse.GetState().MiddleButton == ButtonState.Pressed)
+                {
+                    camera.UpdateFOV(90f);
+                }
             }
             else
             {
+                //walking through walls feature
                 if(gamepad.IsButtonDown(Buttons.Y) && !prevGP.IsButtonDown(Buttons.Y))
                 {
                     if (camera.walkThroughWalls)
@@ -112,8 +148,41 @@ namespace Assignment3.Scenes
                     else
                         camera.walkThroughWalls = true;
                 }
+
+                //return to beginning of maze
+                if(gamepad.IsButtonDown(Buttons.Start) && !prevGP.IsButtonDown(Buttons.Start))
+                {
+                    camera.Position = MazeStartPos;
+                    camera.UpdateFOV(90f);
+                }
+
+                //zoom in
+                if (gamepad.Triggers.Right > 0)
+                {
+                    float fov = camera.getFOV();
+                    if (fov > 45f)
+                        fov--;
+
+                    camera.UpdateFOV(fov);
+                }
+                //zoom out
+                if (gamepad.Triggers.Left > 0)
+                {
+                    float fov = camera.getFOV();
+                    if (fov < 110f)
+                        fov++;
+
+                    camera.UpdateFOV(fov);
+                }
+
+                //reset back to original FOV
+                if (gamepad.IsButtonDown(Buttons.RightStick) && !prevGP.IsButtonDown(Buttons.RightStick))
+                {
+                    camera.UpdateFOV(90f);
+                }
             }
 
+            
 
             mazeRunner.update(gameTime, gamepad, keyboard);
             camera.Update(gameTime);
