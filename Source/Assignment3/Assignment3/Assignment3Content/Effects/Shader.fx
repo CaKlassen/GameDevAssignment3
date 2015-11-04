@@ -10,7 +10,7 @@ float4 AmbientIntensity = 0.1;
 
 // NOT SET IN CODE
 
-float3 DiffuseLightDirection = float3(1, 1, 1);
+float3 DiffuseLightDirection = float3(1, -1, 1);
 float4 DiffuseColor = float4(1, 1, 1, 1);
 float DiffuseIntensity = 1;
 
