@@ -89,7 +89,7 @@ namespace Assignment3.Scenes
 
             prevKB = Keyboard.GetState();
 
-            World = Matrix.CreateTranslation(0, 0, 0);
+            World = Matrix.Identity;
 
             if (GamePad.GetState(PlayerIndex.One).IsConnected)
                 prevGP = GamePad.GetState(PlayerIndex.One);
@@ -245,10 +245,28 @@ namespace Assignment3.Scenes
             Vector3 viewVector = Vector3.Transform(camera.getLookAt() - camera.Position, Matrix.CreateRotationY(0));
             viewVector.Normalize();
 
+            //test
+            Vector3 position = camera.Position;
+            Vector3 LAt = camera.getLookAt();
+            //LAt.X *= -1;
+            //LAt.Z *= -1;
+            //Vector3 LminPos = position - LAt;
+            //LminPos.Normalize();
+            //LminPos = Vector3.TransformNormal(LminPos, Matrix.Invert(World));
+            //Console.Write("LookAt: " + LAt + "\n");
+            //Console.Write("Position - LookAt: " + LminPos + "\n");
+
+            //Console.Write("LookAt: " + LAt + "\nPosition: " + position + "\n");
+
             HLSLeffect.CurrentTechnique = HLSLeffect.Techniques["ShaderTech"];
             
             HLSLeffect.Parameters["AmbientColor"].SetValue(ambientColour);
             HLSLeffect.Parameters["AmbientIntensity"].SetValue(ambientIntensity);
+
+           
+            HLSLeffect.Parameters["spotlightDirection"].SetValue(Vector3.Normalize(position - LAt));
+            HLSLeffect.Parameters["spotlightPosition"].SetValue(Vector3.Transform(position, Projection * View));
+            HLSLeffect.Parameters["lightColor"].SetValue(Color.White.ToVector3());
 
             HLSLeffect.Parameters["View"].SetValue(camera.View);
             HLSLeffect.Parameters["Projection"].SetValue(camera.Projection);

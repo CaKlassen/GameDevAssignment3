@@ -70,13 +70,17 @@ namespace Assignment3.Entities
                 // This is where the mesh orientation is set, as well as our camera and projection.
                 foreach (ModelMeshPart part in mesh.MeshParts)
                 {
-                    part.Effect = effect;
 
-                    effect.Parameters["World"].SetValue(mesh.ParentBone.Transform * worldMatrix);
-                    effect.Parameters["ModelTexture"].SetValue(WallTex);                   
+                    foreach (EffectPass pass in effect.CurrentTechnique.Passes)
+                    {
+                        part.Effect = effect;
 
-                    Matrix worldInverseTransposeMatrix = Matrix.Transpose(Matrix.Invert(mesh.ParentBone.Transform * worldMatrix));
-                    effect.Parameters["WorldInverseTranspose"].SetValue(worldInverseTransposeMatrix);
+                        effect.Parameters["World"].SetValue(mesh.ParentBone.Transform * worldMatrix);
+                        effect.Parameters["ModelTexture"].SetValue(WallTex);
+
+                        Matrix worldInverseTransposeMatrix = Matrix.Transpose(Matrix.Invert(mesh.ParentBone.Transform * worldMatrix));
+                        effect.Parameters["WorldInverseTranspose"].SetValue(worldInverseTransposeMatrix);
+                    }
                 }
                 // Draw the mesh, using the effects set above.
                 mesh.Draw();

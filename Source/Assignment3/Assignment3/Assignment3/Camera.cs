@@ -29,6 +29,7 @@ namespace Assignment3
         private Boolean GhostMode;
         private Matrix projection;
 
+        private Vector3 LookAtDir;
 
         //properties
 
@@ -76,7 +77,7 @@ namespace Assignment3
 
         public Vector3 getLookAt()
         {
-            return LookAt;
+            return LookAtDir;
         }
 
 
@@ -139,8 +140,12 @@ namespace Assignment3
             //build rot Matrix
             Matrix rotationMatrix = Matrix.CreateRotationX(cameraRot.X) * Matrix.CreateRotationY(cameraRot.Y);
 
+            //test
+            LookAtDir = Vector3.Transform(cameraPos, rotationMatrix);
+            //Console.Write("\nCameraPos: " + cameraPos + "\nLookAtDir: " + LookAtDir);
+
             //create lookat offset (change in lookAt)
-            Vector3 LookAtOffset = Vector3.Transform(Vector3.UnitZ, rotationMatrix);
+            Vector3 LookAtOffset = Vector3.Transform(new Vector3(0,0,1), rotationMatrix);
 
             //Update camera's lookAt vector
             LookAt = cameraPos + LookAtOffset;
