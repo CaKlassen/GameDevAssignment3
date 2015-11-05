@@ -8,6 +8,7 @@ float4x4 WorldInverseTranspose;
 float4 AmbientColor = float4(1, 1, 1, 1);
 float4 AmbientIntensity = 0.1;
 
+
 // NOT SET IN CODE
 
 float3 DiffuseLightDirection = float3(1, -1, 1);
@@ -24,6 +25,10 @@ float spotlightPower = 10;
 float3 spotlightPosition;//camera position
 float3 spotlightDirection;//camera lookat-position (normalized)
 float3 lightColor;
+float SpotlightConeAngle = 23.5;
+float ConstAttenuation = 1.0f;
+float LinearAttenuation = 0.2f;
+float QuadraticAttenuation = 0.1f;
 
 //Texture shading
 texture ModelTexture;
@@ -52,6 +57,13 @@ struct VertexShaderOutput
 	float3 TextureCoordinate : TEXCOORD1;
 };
 
+float CalculateSpotCone(float3 spotDir, float3 lightDir)//lightDir is the light from surface to source
+{
+	float minCos = cos(SpotlightConeAngle);//inner cone
+	float maxCos = (minCos + 1.0f) / 2.0f;//outer cone
+	float CosAngle = dot(spotDir, -lightDir);//Angle between the spotlight direction and -L (L is vector of light from surface to source)
+	return smoothstep(minCos, maxCos, CosAngle);//interpolation of intensity between minCos and maxCos
+}
 
 // VERTEX SHADER
 
@@ -99,7 +111,7 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 	float4 textureColor = tex2D(textureSampler, input.TextureCoordinate);
 	textureColor.a = 1;
 
-	return saturate(textureColor * (input.Color) + ambient + specular);
+	return saturate(textureColor * (input.Color) + ambient);
 }
 
 float4 PSspotlight(VertexShaderOutput input) : COLOR0
@@ -109,23 +121,46 @@ float4 PSspotlight(VertexShaderOutput input) : COLOR0
 	//ambient
 	float3 ambient = AmbientColor * AmbientIntensity;//Ka = AmbientIntensity
 
-	//diffuse
+
+
+	
 	float3 L = normalize(spotlightPosition - input.TextureCoordinate);
+	float distance = length(L);
+	L = L / distance;
+
+	//attenuation
+	float attenuation = 1.0f / (ConstAttenuation + LinearAttenuation * distance + QuadraticAttenuation * distance * distance);
+
+	//spotlight intensity
+	float spotlightIntensity = CalculateSpotCone(spotlightDirection, L);
+
+	//diffuse
 	float diffuseLight = max(dot(input.Normal, L), 0);
 	float3 diffuse = DiffuseIntensity * lightColor * diffuseLight;
 
-	//specular
+	//specular; Phong
 	float3 V = normalize(spotlightPosition - input.TextureCoordinate);
+	float3 R = normalize(reflect(-L, input.Normal));
+	float RdotV = max(0.0000000000000001f, dot(R, V));
+
+	/*
 	float3 H = normalize(L + V);
-	float specularLight = pow(dot(input.Normal, H), SpecularIntensity);
+	float specularLight = pow(dot(input.Normal, H), SpecularIntensity);*/
+	float specularLight = pow(RdotV, Shininess);
 
-	if (diffuseLight <= 0)
-		specularLight = 0;
-	float3 specular = SpecularIntensity * lightColor * specularLight;
+	/*if (diffuseLight <= 0)
+		specularLight = 0;*/
+	float3 specular = lightColor * specularLight;//specularIntensity *
 
-	float spotlightScale = pow(max(dot(L, -spotlightDirection), 0), spotlightPower);
+	//float spotlightScale = pow(max(dot(L, -spotlightDirection), 0), spotlightPower);
 
-	float3 light = ambient + (diffuse + specular) * spotlightScale;
+	//float3 light = ambient + (diffuse + specular) * spotlightScale;
+
+	//finalize Diffuse and Specular
+	diffuse = diffuse * attenuation * spotlightIntensity;
+	specular = specular * attenuation * spotlightIntensity;
+
+	float3 light = ambient + diffuse + specular;
 
 	color.rgb *= light;
 
