@@ -111,8 +111,10 @@ namespace Assignment3
             this.VPH = VPH;
             this.VPW = VPW;
 
-            mouseRotationBuffer.X = rotation.Y;
-            RS.X = rotation.Y;
+            //THIS WAS MESSING UP THE DIRECTION VECTOR INITIALLY
+            //mouseRotationBuffer.X = rotation.Y;
+            //RS.X = rotation.Y;
+
             //set cam pos and rot
             MoveTo(position, rotation);
 
@@ -140,7 +142,6 @@ namespace Assignment3
             //build rot Matrix
             Matrix rotationMatrix = Matrix.CreateRotationX(cameraRot.X) * Matrix.CreateRotationY(cameraRot.Y);
 
-            //test
             LookAtDir = Vector3.Transform(cameraPos, rotationMatrix);
             //Console.Write("\nCameraPos: " + cameraPos + "\nLookAtDir: " + LookAtDir);
 
@@ -149,6 +150,7 @@ namespace Assignment3
 
             //Update camera's lookAt vector
             LookAt = cameraPos + LookAtOffset;
+            //Console.Write("\nLookAt: " + LookAt);
         }
 
         //preview movement for collisions
@@ -252,7 +254,7 @@ namespace Assignment3
                     {
                         mouseRotationBuffer.Y = mouseRotationBuffer.Y - (mouseRotationBuffer.Y - MathHelper.ToRadians(75f));
                     }
-
+                    
                     //limit Y to only 75 for looking up or down; wrap X (make it 360)
                     Rotation = new Vector3(-MathHelper.Clamp(mouseRotationBuffer.Y, MathHelper.ToRadians(-75f), MathHelper.ToRadians(75f)), MathHelper.WrapAngle(mouseRotationBuffer.X), 0);
 
@@ -289,10 +291,10 @@ namespace Assignment3
                 //Controller camera rotation
                 float rotX = gps.ThumbSticks.Right.X;
                 float rotY = gps.ThumbSticks.Right.Y * -1;
-
+                
                 RS.X -= 4.045f * rotX * DeltaTime;
                 RS.Y -= 4.045f * rotY * DeltaTime;
-
+                
                 if (RS.Y < MathHelper.ToRadians(-75f))
                 {
                     RS.Y = RS.Y - (RS.Y - MathHelper.ToRadians(-75f));
@@ -304,7 +306,7 @@ namespace Assignment3
                 }
 
                 Rotation = new Vector3(-MathHelper.Clamp(RS.Y, MathHelper.ToRadians(-75f), MathHelper.ToRadians(75f)), MathHelper.WrapAngle(RS.X), 0);
-            }
+            } 
 
         }
 
