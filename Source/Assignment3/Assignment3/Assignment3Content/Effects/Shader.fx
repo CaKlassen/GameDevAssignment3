@@ -116,6 +116,7 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 
 float4 PSspotlight(VertexShaderOutput input) : COLOR0
 {
+
 	float4 color = tex2D(textureSampler, input.TextureCoordinate);
 
 	//ambient
@@ -143,17 +144,18 @@ float4 PSspotlight(VertexShaderOutput input) : COLOR0
 	float3 R = normalize(reflect(-L, input.Normal));
 	float RdotV = max(0.0000000000000001f, dot(R, V));
 
-	/*
+	/* THIS WAS BLINN-PHONG
 	float3 H = normalize(L + V);
 	float specularLight = pow(dot(input.Normal, H), SpecularIntensity);*/
-	float specularLight = pow(RdotV, Shininess);
+	float specularLight = pow(RdotV, Shininess);//THIS IS PHONG
 
 	/*if (diffuseLight <= 0)
 		specularLight = 0;*/
 	float3 specular = lightColor * specularLight;//specularIntensity *
 
-	//float spotlightScale = pow(max(dot(L, -spotlightDirection), 0), spotlightPower);
 
+	//NOT USED ATM
+	//float spotlightScale = pow(max(dot(L, -spotlightDirection), 0), spotlightPower);
 	//float3 light = ambient + (diffuse + specular) * spotlightScale;
 
 	//finalize Diffuse and Specular
@@ -171,13 +173,13 @@ float4 PSspotlight(VertexShaderOutput input) : COLOR0
 
 technique ShaderTech
 {
-	pass Pass1
-	{
-		VertexShader = compile vs_2_0 VertexShaderFunction();
-		PixelShader = compile ps_2_0 PixelShaderFunction();
-	}
+	//pass Pass1
+	//{
+	//	VertexShader = compile vs_2_0 VertexShaderFunction();
+	//	PixelShader = compile ps_2_0 PixelShaderFunction();
+	//}
 
-	pass Pass2
+	pass Pass1
 	{
 		VertexShader = compile vs_2_0 VertexShaderFunction();
 		PixelShader = compile ps_2_0 PSspotlight();

@@ -68,7 +68,7 @@ namespace Assignment3.Scenes
 
             // Create the camera/player
             AspectRatio = BaseGame.instance.GraphicsDevice.Viewport.AspectRatio;
-            camera = new Camera(new Vector3(startPos.X * 4, 2f, startPos.Y * 4), new Vector3(0f, 180f, 0f), 10f, AspectRatio,
+            camera = new Camera(new Vector3(startPos.X * 4, 2f, startPos.Y * 4), new Vector3(0f, 0f, 0f), 10f, AspectRatio,
                 BaseGame.instance.GraphicsDevice.Viewport.Height, BaseGame.instance.GraphicsDevice.Viewport.Width);
 
             mazeRunner = new Player();
@@ -203,30 +203,27 @@ namespace Assignment3.Scenes
             BaseGame.instance.GraphicsDevice.SamplerStates[0] = SamplerState.LinearWrap;
 
             // Update the shader parameters
-            Vector3 viewVector = Vector3.Transform(camera.getLookAt() - camera.Position, Matrix.CreateRotationY(0));
+            Vector3 viewVector = camera.getLookAt() - camera.Position;
             viewVector.Normalize();
 
+
+
             //test
+            Matrix cameraWorld = Matrix.CreateTranslation(camera.Position);
             Vector3 position = camera.Position;
             Vector3 LAt = camera.getLookAt();
-            //LAt.X *= -1;
-            //LAt.Z *= -1;
-            //Vector3 LminPos = position - LAt;
-            //LminPos.Normalize();
-            //LminPos = Vector3.TransformNormal(LminPos, Matrix.Invert(World));
-            //Console.Write("LookAt: " + LAt + "\n");
-            //Console.Write("Position - LookAt: " + LminPos + "\n");
 
-            //Console.Write("LookAt: " + LAt + "\nPosition: " + position + "\n");
+            //Console.Write("\nLookAt: " + LAt + "\n");           
+            //Console.Write("\nPosition: " + position + "\n");
 
             HLSLeffect.CurrentTechnique = HLSLeffect.Techniques["ShaderTech"];
 
             HLSLeffect.Parameters["AmbientColor"].SetValue(Color.White.ToVector4());
             HLSLeffect.Parameters["AmbientIntensity"].SetValue(0.1f);
 
-           
+            
             HLSLeffect.Parameters["spotlightDirection"].SetValue(Vector3.Normalize(position - LAt));
-            HLSLeffect.Parameters["spotlightPosition"].SetValue(Vector3.Transform(position, Projection * View));
+            HLSLeffect.Parameters["spotlightPosition"].SetValue(Vector3.Transform(position, View));
             HLSLeffect.Parameters["lightColor"].SetValue(Color.White.ToVector3());
 
             HLSLeffect.Parameters["View"].SetValue(camera.View);
@@ -235,7 +232,7 @@ namespace Assignment3.Scenes
 
             floor.draw(sb, HLSLeffect);
 
-            //// Render the model list
+            //Render the model list
             foreach (Entity e in collideList)
             {
                 e.draw(sb, HLSLeffect);
