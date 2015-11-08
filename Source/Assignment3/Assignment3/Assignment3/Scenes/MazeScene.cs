@@ -10,6 +10,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using Assignment3.Entities;
+using Assignment3.Utilities;
 
 namespace Assignment3.Scenes
 {
@@ -42,6 +43,16 @@ namespace Assignment3.Scenes
 
         public Effect HLSLeffect;
 
+        private static int AMBIENT_RATE = 20;
+        private static Vector4 nightColour = new Vector4(0, 0, 0.55f, 1);
+        private static Vector4 dayColour = new Vector4(1, 0.84f, 0, 1);
+        private static float nightIntensity = 0.8f;
+        private static float dayIntensity = 0.1f;
+
+        private Vector4 ambientColour = dayColour;
+        private float ambientIntensity = dayIntensity;
+        private bool day = true;
+
 
         public MazeScene()
         {
@@ -63,7 +74,7 @@ namespace Assignment3.Scenes
             MazeStartPos = new Vector3(startPos.X * 4, 2f, startPos.Y * 4);
 
             // Create the floor
-            Vector3 floorPos = new Vector3(rawMaze.GetLength(0) / 2f, 0, rawMaze.GetLength(0) / 2f);
+            Vector3 floorPos = new Vector3(rawMaze.GetLength(0) / 2f, -1, rawMaze.GetLength(0) / 2f);
             floor = new Floor(content, floorPos, rawMaze.GetLength(0));
 
             // Create the camera/player
@@ -137,6 +148,12 @@ namespace Assignment3.Scenes
                 {
                     camera.UpdateFOV(90f);
                 }
+
+                // Switching day/night
+                if (keyboard.IsKeyDown(Keys.Q) && !prevKB.IsKeyDown(Keys.Q))
+                {
+                    day = !day;
+                }
             }
             else
             {
@@ -180,9 +197,31 @@ namespace Assignment3.Scenes
                 {
                     camera.UpdateFOV(90f);
                 }
+
+                // Switching day/night
+                if (gamepad.IsButtonDown(Buttons.LeftTrigger) && !prevGP.IsButtonDown(Buttons.LeftTrigger))
+                {
+                    day = !day;
+                }
             }
 
-            
+            // Update the ambience
+            if (day)
+            {
+                ambientColour.X += PhysicsUtil.smoothChange(ambientColour.X, dayColour.X, AMBIENT_RATE);
+                ambientColour.Y += PhysicsUtil.smoothChange(ambientColour.Y, dayColour.Y, AMBIENT_RATE);
+                ambientColour.Z += PhysicsUtil.smoothChange(ambientColour.Z, dayColour.Z, AMBIENT_RATE);
+
+                ambientIntensity += PhysicsUtil.smoothChange(ambientIntensity, dayIntensity, AMBIENT_RATE);
+            }
+            else
+            {
+                ambientColour.X += PhysicsUtil.smoothChange(ambientColour.X, nightColour.X, AMBIENT_RATE);
+                ambientColour.Y += PhysicsUtil.smoothChange(ambientColour.Y, nightColour.Y, AMBIENT_RATE);
+                ambientColour.Z += PhysicsUtil.smoothChange(ambientColour.Z, nightColour.Z, AMBIENT_RATE);
+
+                ambientIntensity += PhysicsUtil.smoothChange(ambientIntensity, nightIntensity, AMBIENT_RATE);
+            }
 
             mazeRunner.update(gameTime, gamepad, keyboard);
             camera.Update(gameTime);
@@ -213,17 +252,17 @@ namespace Assignment3.Scenes
             Vector3 position = camera.Position;
             Vector3 LAt = camera.getLookAt();
 
-            //Console.Write("\nLookAt: " + LAt + "\n");           
+            //Console.Write("\nLookAt: " +Vector3.Normalize( LAt )+ "\n");           
             //Console.Write("\nPosition: " + position + "\n");
 
             HLSLeffect.CurrentTechnique = HLSLeffect.Techniques["ShaderTech"];
-
-            HLSLeffect.Parameters["AmbientColor"].SetValue(Color.White.ToVector4());
-            HLSLeffect.Parameters["AmbientIntensity"].SetValue(0.1f);
+            
+            HLSLeffect.Parameters["AmbientColor"].SetValue(ambientColour);
+            HLSLeffect.Parameters["AmbientIntensity"].SetValue(ambientIntensity);
 
             
-            HLSLeffect.Parameters["spotlightDirection"].SetValue(Vector3.Normalize(position - LAt));
-            HLSLeffect.Parameters["spotlightPosition"].SetValue(Vector3.Transform(position, View));
+            HLSLeffect.Parameters["spotlightDirection"].SetValue(Vector3.Normalize(LAt));
+            HLSLeffect.Parameters["spotlightPosition"].SetValue(position);//SetValue(Vector3.Transform(position, View));
             HLSLeffect.Parameters["lightColor"].SetValue(Color.White.ToVector3());
 
             HLSLeffect.Parameters["View"].SetValue(camera.View);

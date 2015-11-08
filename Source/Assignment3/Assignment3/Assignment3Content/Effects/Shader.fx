@@ -90,30 +90,6 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 
 // PIXEL SHADER
 
-float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
-{
-	
-	float3 light = normalize(DiffuseLightDirection);
-	float3 normal = normalize(input.Normal);
-	float3 r = normalize(2 * dot(light, normal) * normal - light);
-	float3 v = normalize(mul(normalize(ViewVector), World));
-
-	//ambient
-	float4 ambient = AmbientColor * AmbientIntensity;//Ka = AmbientIntensity
-
-	float dotProduct = dot(r, v);
-
-	//specular
-	float4 specular = SpecularIntensity * SpecularColor * max(pow(dotProduct, Shininess), 0) * length(input.Color);
-
-	
-	//Texture shading
-	float4 textureColor = tex2D(textureSampler, input.TextureCoordinate);
-	textureColor.a = 1;
-
-	return saturate(textureColor * (input.Color) + ambient);
-}
-
 float4 PSspotlight(VertexShaderOutput input) : COLOR0
 {
 
@@ -122,12 +98,15 @@ float4 PSspotlight(VertexShaderOutput input) : COLOR0
 	//ambient
 	float3 ambient = AmbientColor * AmbientIntensity;//Ka = AmbientIntensity
 
+	float3 pos = spotlightPosition;
 
-
+	pos = mul(spotlightPosition, World);
+	pos = mul(pos, View);
+	//pos = mul(pos, Projection);
 	
-	float3 L = normalize(spotlightPosition - input.TextureCoordinate);
+	float3 L = normalize(pos - input.TextureCoordinate);
 	float distance = length(L);
-	L = L / distance;
+	//L = L / distance;
 
 	//attenuation
 	float attenuation = 1.0f / (ConstAttenuation + LinearAttenuation * distance + QuadraticAttenuation * distance * distance);
@@ -140,7 +119,7 @@ float4 PSspotlight(VertexShaderOutput input) : COLOR0
 	float3 diffuse = DiffuseIntensity * lightColor * diffuseLight;
 
 	//specular; Phong
-	float3 V = normalize(spotlightPosition - input.TextureCoordinate);
+	float3 V = normalize(pos - input.TextureCoordinate);
 	float3 R = normalize(reflect(-L, input.Normal));
 	float RdotV = max(0.0000000000000001f, dot(R, V));
 
@@ -159,7 +138,7 @@ float4 PSspotlight(VertexShaderOutput input) : COLOR0
 	//float3 light = ambient + (diffuse + specular) * spotlightScale;
 
 	//finalize Diffuse and Specular
-	diffuse = diffuse * attenuation * spotlightIntensity;
+	//diffuse = diffuse * attenuation * spotlightIntensity;
 	specular = specular * attenuation * spotlightIntensity;
 
 	float3 light = ambient + diffuse + specular;
