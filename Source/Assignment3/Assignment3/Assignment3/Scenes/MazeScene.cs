@@ -252,7 +252,7 @@ namespace Assignment3.Scenes
             Vector3 position = camera.Position;
             Vector3 LAt = camera.getLookAt();
 
-            //Console.Write("\nLookAt: " + LAt + "\n");           
+            //Console.Write("\nLookAt: " +Vector3.Normalize( LAt )+ "\n");           
             //Console.Write("\nPosition: " + position + "\n");
 
             HLSLeffect.CurrentTechnique = HLSLeffect.Techniques["ShaderTech"];
@@ -261,8 +261,8 @@ namespace Assignment3.Scenes
             HLSLeffect.Parameters["AmbientIntensity"].SetValue(ambientIntensity);
 
             
-            HLSLeffect.Parameters["spotlightDirection"].SetValue(Vector3.Normalize(position - LAt));
-            HLSLeffect.Parameters["spotlightPosition"].SetValue(Vector3.Transform(position, View));
+            HLSLeffect.Parameters["spotlightDirection"].SetValue(Vector3.Normalize(LAt));
+            HLSLeffect.Parameters["spotlightPosition"].SetValue(position);//SetValue(Vector3.Transform(position, View));
             HLSLeffect.Parameters["lightColor"].SetValue(Color.White.ToVector3());
 
             HLSLeffect.Parameters["View"].SetValue(camera.View);
