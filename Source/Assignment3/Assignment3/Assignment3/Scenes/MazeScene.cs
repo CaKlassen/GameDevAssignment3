@@ -33,6 +33,7 @@ namespace Assignment3.Scenes
         public List<Entity> collideList = new List<Entity>();
         private bool[,] rawMaze;
         private Floor floor;
+        private Floor roof;
 
         private KeyboardState prevKB;
         private GamePadState prevGP;
@@ -75,7 +76,9 @@ namespace Assignment3.Scenes
 
             // Create the floor
             Vector3 floorPos = new Vector3(rawMaze.GetLength(0) / 2f, -0.5f, rawMaze.GetLength(0) / 2f);
+            Vector3 roofPos = new Vector3(rawMaze.GetLength(0) / 2f, 2f, rawMaze.GetLength(0) / 2f);
             floor = new Floor(content, floorPos, rawMaze.GetLength(0));
+            roof = new Floor(content, roofPos, rawMaze.GetLength(0));
 
             // Create the camera/player
             AspectRatio = BaseGame.instance.GraphicsDevice.Viewport.AspectRatio;
@@ -272,6 +275,7 @@ namespace Assignment3.Scenes
             //HLSLeffect.Parameters["ViewVector"].SetValue(viewVector);
 
             floor.draw(sb, HLSLeffect);
+            roof.draw(sb, HLSLeffect);
 
             //Render the model list
             foreach (Entity e in collideList)
