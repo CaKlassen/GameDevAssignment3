@@ -83,6 +83,7 @@ namespace Assignment3.Scenes
                 BaseGame.instance.GraphicsDevice.Viewport.Height, BaseGame.instance.GraphicsDevice.Viewport.Width);
 
             mazeRunner = new Player();
+            mazeRunner.position = camera.Position;
             mazeRunner.Load(content);
 
             
@@ -250,10 +251,10 @@ namespace Assignment3.Scenes
             //test
             Matrix cameraWorld = Matrix.CreateTranslation(camera.Position);
             Vector3 position = camera.Position;
-            Vector3 LAt = camera.getLookAt();
+            Vector3 LAt = camera.getLookAt() -position;
 
             Console.Write("\nLookAt: " +Vector3.Normalize( LAt )+ "\n");
-            Console.Write("\nView Vector: " + viewVector + "\n");
+            //Console.Write("\nView Vector: " + viewVector + "\n");
             //Console.Write("\nPosition: " + position + "\n");
 
             HLSLeffect.CurrentTechnique = HLSLeffect.Techniques["ShaderTech"];
