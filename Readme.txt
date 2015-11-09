@@ -40,6 +40,7 @@ Left Thumbstick - Movement
 Right Thumbstick - Look around
 Left Trigger - Zoom In
 Right Trigger - Zoom Out
+Click Right Thumbstick - Reset Zoom
 Left Shoulder - Toggle Night/Day
 Right Shoulder - Toggle Fog
 Start - Reset to beginning of maze
