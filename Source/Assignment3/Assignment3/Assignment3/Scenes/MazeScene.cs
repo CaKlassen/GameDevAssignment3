@@ -45,10 +45,10 @@ namespace Assignment3.Scenes
         public Effect HLSLeffect;
 
         private static int AMBIENT_RATE = 20;
-        private static Vector4 nightColour = new Vector4(0, 0, 0.55f, 1);
-        private static Vector4 dayColour = new Vector4(1, 0.84f, 0, 1);
-        private static float nightIntensity = 0.8f;
-        private static float dayIntensity = 0.1f;
+        private static Vector4 nightColour = new Vector4(0.05f, 0, 0.2f, 1);
+        private static Vector4 dayColour = new Vector4(1, 0.8f, 0, 1);
+        private static float nightIntensity = 0.9f;
+        private static float dayIntensity = 0.2f;
 
         private Vector4 ambientColour = dayColour;
         private float ambientIntensity = dayIntensity;
@@ -91,7 +91,6 @@ namespace Assignment3.Scenes
 
             
 
-            prevKB = Keyboard.GetState();
 
             World = Matrix.Identity;
 
@@ -103,6 +102,7 @@ namespace Assignment3.Scenes
 
         public override void update(GameTime gameTime, GamePadState gamepad, KeyboardState keyboard)
         {
+
             if (keyboard.IsKeyDown(Keys.Escape))
             {
                 // Go to the maze
@@ -235,6 +235,9 @@ namespace Assignment3.Scenes
             {
                 e.update(gameTime, gamepad, keyboard);
             }
+
+            prevKB = keyboard;
+            prevGP = gamepad;
         }
 
         public override void draw(SpriteBatch sb)
