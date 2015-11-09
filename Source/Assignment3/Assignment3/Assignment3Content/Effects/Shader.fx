@@ -24,6 +24,7 @@ float4 fogColor = float4(0.3, 0.3, 0.3, 1);
 float Kc = 1; //Constant Attenuation
 float Kl = 0.2; //Linear Attenuation
 float Kq = 0.1; //quadratic Attenuation
+float FlashlightAngle;
 
 //Texture shading
 texture ModelTexture;
@@ -83,7 +84,7 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 	float distance = length(EyePosition - input.PositionOut);
 
 	//spot cone
-	float minCos = cos(0.785398f);
+	float minCos = cos(FlashlightAngle);
 	float maxCos = (minCos + 1.0f) / 2.0f;
 	float cosAngle = dot(LightDirection, -(L/distance));
 	float spotIntensity = smoothstep(minCos, maxCos, cosAngle);
@@ -94,13 +95,11 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 	float4 normal = float4(input.Normal, 1.0);
 	float4 diffuse = saturate(dot(-LightDirection,normal)) * Attenuation * spotIntensity;
 	float4 reflect = normalize(2 * diffuse*normal - float4(LightDirection, 1.0));
-	float4 specular = pow(saturate(dot(reflect, input.View)), 2) * Attenuation *spotIntensity;
+	float4 specular = pow(saturate(dot(reflect, input.View)), 2) * Attenuation * spotIntensity;
 	
 	// Calculate fog
 	float fog = clamp((distance - fogNear) / (fogFar - fogNear), 0, 1);
-
-
-
+	
 	// Calculate final colouration
 	float4 color = tex2D(textureSampler, input.TextureCoordinate);
 	color.rgb *= AmbientColor * AmbientIntensity + DiffuseIntensity * DiffuseColor * diffuse + SpecularColor * specular;

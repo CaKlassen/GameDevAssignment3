@@ -45,12 +45,18 @@ namespace Assignment3.Scenes
         public Effect HLSLeffect;
 
         private static int AMBIENT_RATE = 20;
-        private static Vector4 nightColour = new Vector4(0.05f, 0, 0.2f, 1);
-        private static Vector4 dayColour = new Vector4(1, 0.8f, 0, 1);
+        private static Vector4 nightColour = new Vector4(0.05f, 0, 0.1f, 1);
+        private static Vector4 dayColour = new Vector4(1, 1, 0.9f, 1);
+        private static Vector4 nightFogColour = new Vector4(0.02f, 0.02f, 0.02f, 1);
+        private static Vector4 dayFogColour = new Vector4(0.4f, 0.4f, 0.4f, 1);
+        private static float dayFlashlight = 2.0f;
+        private static float nightFlashlight = 0.785398f;
         private static float nightIntensity = 0.9f;
         private static float dayIntensity = 0.2f;
 
         private Vector4 ambientColour = dayColour;
+        private Vector4 fogColour = dayFogColour;
+        private float flashlight = dayFlashlight;
         private float ambientIntensity = dayIntensity;
         private bool day = true;
 
@@ -74,11 +80,13 @@ namespace Assignment3.Scenes
             Vector2 startPos = builder.getStartPos();
             MazeStartPos = new Vector3(startPos.X * 4, 2f, startPos.Y * 4);
 
+            float length = rawMaze.GetLength(0) / 2f;
+
             // Create the floor
-            Vector3 floorPos = new Vector3(rawMaze.GetLength(0) / 2f, -0.5f, rawMaze.GetLength(0) / 2f);
-            Vector3 roofPos = new Vector3(rawMaze.GetLength(0) / 2f, 2f, rawMaze.GetLength(0) / 2f);
-            floor = new Floor(content, floorPos, rawMaze.GetLength(0));
-            roof = new Floor(content, roofPos, rawMaze.GetLength(0));
+            Vector3 floorPos = new Vector3(16.5f, -0.8f, 16.5f);
+            Vector3 roofPos = new Vector3(rawMaze.GetLength(0) / 2f, 2.5f, rawMaze.GetLength(0) / 2f);
+            floor = new Floor(content, floorPos, 30);
+            roof = new Floor(content, roofPos, 30);
 
             // Create the camera/player
             AspectRatio = BaseGame.instance.GraphicsDevice.Viewport.AspectRatio;
@@ -88,9 +96,7 @@ namespace Assignment3.Scenes
             mazeRunner = new Player();
             mazeRunner.position = camera.Position;
             mazeRunner.Load(content);
-
             
-
 
             World = Matrix.Identity;
 
@@ -154,7 +160,7 @@ namespace Assignment3.Scenes
                 }
 
                 // Switching day/night
-                if (keyboard.IsKeyDown(Keys.Q) && !prevKB.IsKeyDown(Keys.Q))
+                if (keyboard.IsKeyDown(Keys.Z) && !prevKB.IsKeyDown(Keys.Z))
                 {
                     day = !day;
                 }
@@ -203,7 +209,7 @@ namespace Assignment3.Scenes
                 }
 
                 // Switching day/night
-                if (gamepad.IsButtonDown(Buttons.LeftTrigger) && !prevGP.IsButtonDown(Buttons.LeftTrigger))
+                if (gamepad.IsButtonDown(Buttons.LeftShoulder) && !prevGP.IsButtonDown(Buttons.LeftShoulder))
                 {
                     day = !day;
                 }
@@ -217,6 +223,11 @@ namespace Assignment3.Scenes
                 ambientColour.Z += PhysicsUtil.smoothChange(ambientColour.Z, dayColour.Z, AMBIENT_RATE);
 
                 ambientIntensity += PhysicsUtil.smoothChange(ambientIntensity, dayIntensity, AMBIENT_RATE);
+                flashlight += PhysicsUtil.smoothChange(flashlight, dayFlashlight, AMBIENT_RATE);
+
+                fogColour.X += PhysicsUtil.smoothChange(fogColour.X, dayFogColour.X, AMBIENT_RATE);
+                fogColour.Y += PhysicsUtil.smoothChange(fogColour.Y, dayFogColour.Y, AMBIENT_RATE);
+                fogColour.Z += PhysicsUtil.smoothChange(fogColour.Z, dayFogColour.Z, AMBIENT_RATE);
             }
             else
             {
@@ -225,6 +236,11 @@ namespace Assignment3.Scenes
                 ambientColour.Z += PhysicsUtil.smoothChange(ambientColour.Z, nightColour.Z, AMBIENT_RATE);
 
                 ambientIntensity += PhysicsUtil.smoothChange(ambientIntensity, nightIntensity, AMBIENT_RATE);
+                flashlight += PhysicsUtil.smoothChange(flashlight, nightFlashlight, AMBIENT_RATE);
+
+                fogColour.X += PhysicsUtil.smoothChange(fogColour.X, nightFogColour.X, AMBIENT_RATE);
+                fogColour.Y += PhysicsUtil.smoothChange(fogColour.Y, nightFogColour.Y, AMBIENT_RATE);
+                fogColour.Z += PhysicsUtil.smoothChange(fogColour.Z, nightFogColour.Z, AMBIENT_RATE);
             }
 
             mazeRunner.update(gameTime, gamepad, keyboard);
@@ -267,6 +283,8 @@ namespace Assignment3.Scenes
             
             HLSLeffect.Parameters["AmbientColor"].SetValue(ambientColour);
             HLSLeffect.Parameters["AmbientIntensity"].SetValue(ambientIntensity);
+            HLSLeffect.Parameters["fogColor"].SetValue(fogColour);
+            HLSLeffect.Parameters["FlashlightAngle"].SetValue(flashlight);
 
             //HLSLeffect.Parameters["SpotlightConeAngle"].SetValue(MathHelper.ToRadians(23.5f));
             HLSLeffect.Parameters["LightDirection"].SetValue(Vector3.Normalize(LAt));
