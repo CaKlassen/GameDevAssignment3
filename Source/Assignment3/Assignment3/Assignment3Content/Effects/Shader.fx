@@ -16,9 +16,10 @@ float DiffuseIntensity = 1;
 float4 SpecularColor = float4(1, 1, 1, 0.05);
 float3 EyePosition;
 
-float fogNear = 10.0;
-float fogFar = 20.0;
+float fogNear = 5.0;
+float fogFar = 15.0;
 float4 fogColor = float4(0.3, 0.3, 0.3, 1);
+bool fogEnabled;
 
 //Attenuation Variables
 float Kc = 1; //Constant Attenuation
@@ -98,7 +99,7 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 	float4 specular = pow(saturate(dot(reflect, input.View)), 2) * Attenuation * spotIntensity;
 	
 	// Calculate fog
-	float fog = clamp((distance - fogNear) / (fogFar - fogNear), 0, 1);
+	float fog = clamp((distance - fogNear) / (fogFar - fogNear), 0, 1) * fogEnabled;
 	
 	// Calculate final colouration
 	float4 color = tex2D(textureSampler, input.TextureCoordinate);

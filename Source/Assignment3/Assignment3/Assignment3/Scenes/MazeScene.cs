@@ -56,9 +56,13 @@ namespace Assignment3.Scenes
 
         private Vector4 ambientColour = dayColour;
         private Vector4 fogColour = dayFogColour;
+        bool fogEnabled = true;
         private float flashlight = dayFlashlight;
         private float ambientIntensity = dayIntensity;
         private bool day = true;
+
+        MazeDifficulty difficulty;
+        private float[] fogLevels = { 30, 20, 10 };
 
 
         public MazeScene()
@@ -70,7 +74,7 @@ namespace Assignment3.Scenes
         {
             HLSLeffect = content.Load<Effect>("Effects/Shader");
 
-            MazeDifficulty difficulty = MazeCommunication.getDifficulty();
+            difficulty = MazeCommunication.getDifficulty();
 
             // Generate the maze
             MazeBuilder builder = new MazeBuilder(((int)difficulty + 1) * 10);
@@ -164,6 +168,12 @@ namespace Assignment3.Scenes
                 {
                     day = !day;
                 }
+
+                // Toggle fog
+                if (keyboard.IsKeyDown(Keys.X) && !prevKB.IsKeyDown(Keys.X))
+                {
+                    fogEnabled = !fogEnabled;
+                }
             }
             else
             {
@@ -212,6 +222,12 @@ namespace Assignment3.Scenes
                 if (gamepad.IsButtonDown(Buttons.LeftShoulder) && !prevGP.IsButtonDown(Buttons.LeftShoulder))
                 {
                     day = !day;
+                }
+
+                // Toggle fog
+                if (gamepad.IsButtonDown(Buttons.RightShoulder) && !prevGP.IsButtonDown(Buttons.RightShoulder))
+                {
+                    fogEnabled = !fogEnabled;
                 }
             }
 
@@ -284,6 +300,8 @@ namespace Assignment3.Scenes
             HLSLeffect.Parameters["AmbientColor"].SetValue(ambientColour);
             HLSLeffect.Parameters["AmbientIntensity"].SetValue(ambientIntensity);
             HLSLeffect.Parameters["fogColor"].SetValue(fogColour);
+            HLSLeffect.Parameters["fogFar"].SetValue(fogLevels[(int) difficulty]);
+            HLSLeffect.Parameters["fogEnabled"].SetValue(fogEnabled);
             HLSLeffect.Parameters["FlashlightAngle"].SetValue(flashlight);
 
             //HLSLeffect.Parameters["SpotlightConeAngle"].SetValue(MathHelper.ToRadians(23.5f));
