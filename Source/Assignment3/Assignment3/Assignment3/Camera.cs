@@ -29,8 +29,6 @@ namespace Assignment3
         private Boolean GhostMode;
         private Matrix projection;
 
-        private Vector3 LookAtDir;
-
         //properties
 
         public Boolean walkThroughWalls
@@ -78,7 +76,6 @@ namespace Assignment3
         public Vector3 getLookAt()
         {
             return LookAt;
-            //return LookAtDir;
         }
 
 
@@ -112,10 +109,6 @@ namespace Assignment3
             this.VPH = VPH;
             this.VPW = VPW;
 
-            //THIS WAS MESSING UP THE DIRECTION VECTOR INITIALLY
-            //mouseRotationBuffer.X = rotation.Y;
-            //RS.X = rotation.Y;
-
             //set cam pos and rot
             MoveTo(position, rotation);
 
@@ -132,9 +125,6 @@ namespace Assignment3
         {
             Position = Pos;
             Rotation = Rot;
-            //set player collision model position
-            //if(MazeScene.instance.mazeRunner != null)
-            //    MazeScene.instance.mazeRunner.position = Position;
         }
 
         //update look at
@@ -143,15 +133,11 @@ namespace Assignment3
             //build rot Matrix
             Matrix rotationMatrix = Matrix.CreateRotationX(cameraRot.X) * Matrix.CreateRotationY(cameraRot.Y);
 
-            LookAtDir = Vector3.Transform(cameraPos, rotationMatrix);
-            //Console.Write("\nCameraPos: " + cameraPos + "\nLookAtDir: " + LookAtDir);
-
             //create lookat offset (change in lookAt)
             Vector3 LookAtOffset = Vector3.Transform(new Vector3(0,0,1), rotationMatrix);
 
             //Update camera's lookAt vector
             LookAt = cameraPos + LookAtOffset;
-            //Console.Write("\nLookAt: " + LookAt);
         }
 
         //preview movement for collisions
