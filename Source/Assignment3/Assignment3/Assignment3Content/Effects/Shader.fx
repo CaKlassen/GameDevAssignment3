@@ -106,7 +106,7 @@ float4 PSspotlight(VertexShaderOutput input) : COLOR0
 	
 	float3 L = normalize(pos - input.TextureCoordinate);
 	float distance = length(L);
-	//L = L / distance;
+	L = L / distance;
 
 	//attenuation
 	float attenuation = 1.0f / (ConstAttenuation + LinearAttenuation * distance + QuadraticAttenuation * distance * distance);

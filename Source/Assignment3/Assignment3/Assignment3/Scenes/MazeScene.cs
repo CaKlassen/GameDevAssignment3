@@ -74,7 +74,7 @@ namespace Assignment3.Scenes
             MazeStartPos = new Vector3(startPos.X * 4, 2f, startPos.Y * 4);
 
             // Create the floor
-            Vector3 floorPos = new Vector3(rawMaze.GetLength(0) / 2f, -1, rawMaze.GetLength(0) / 2f);
+            Vector3 floorPos = new Vector3(rawMaze.GetLength(0) / 2f, -0.5f, rawMaze.GetLength(0) / 2f);
             floor = new Floor(content, floorPos, rawMaze.GetLength(0));
 
             // Create the camera/player
@@ -251,8 +251,8 @@ namespace Assignment3.Scenes
             Matrix cameraWorld = Matrix.CreateTranslation(camera.Position);
             Vector3 position = camera.Position;
             Vector3 LAt = camera.getLookAt();
-
-            //Console.Write("\nLookAt: " +Vector3.Normalize( LAt )+ "\n");           
+            
+            Console.Write("\nLookAt: " +Vector3.Normalize( LAt )+ "\n");           
             //Console.Write("\nPosition: " + position + "\n");
 
             HLSLeffect.CurrentTechnique = HLSLeffect.Techniques["ShaderTech"];
@@ -261,7 +261,7 @@ namespace Assignment3.Scenes
             HLSLeffect.Parameters["AmbientIntensity"].SetValue(ambientIntensity);
 
             HLSLeffect.Parameters["SpotlightConeAngle"].SetValue(MathHelper.ToRadians(23.5f));
-            HLSLeffect.Parameters["spotlightDirection"].SetValue(Vector3.Normalize(LAt));
+            HLSLeffect.Parameters["spotlightDirection"].SetValue(LAt);
             HLSLeffect.Parameters["spotlightPosition"].SetValue(position);//SetValue(Vector3.Transform(position, View));
             HLSLeffect.Parameters["lightColor"].SetValue(Color.White.ToVector3());
 
