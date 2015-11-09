@@ -79,7 +79,7 @@ namespace Assignment3.Entities
                         effect.Parameters["ModelTexture"].SetValue(WallTex);
 
                         Matrix worldInverseTransposeMatrix = Matrix.Transpose(Matrix.Invert(mesh.ParentBone.Transform * worldMatrix));
-                        effect.Parameters["WorldInverseTranspose"].SetValue(worldInverseTransposeMatrix);
+                        //effect.Parameters["WorldInverseTranspose"].SetValue(worldInverseTransposeMatrix);
                     }
                 }
                 // Draw the mesh, using the effects set above.
