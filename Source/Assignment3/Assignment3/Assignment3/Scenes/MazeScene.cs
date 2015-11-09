@@ -251,7 +251,7 @@ namespace Assignment3.Scenes
             Matrix cameraWorld = Matrix.CreateTranslation(camera.Position);
             Vector3 position = camera.Position;
             Vector3 LAt = camera.getLookAt();
-            
+            LAt *= -1;
             Console.Write("\nLookAt: " +Vector3.Normalize( LAt )+ "\n");           
             //Console.Write("\nPosition: " + position + "\n");
 

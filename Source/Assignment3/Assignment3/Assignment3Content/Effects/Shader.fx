@@ -68,7 +68,8 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 	float4 viewPosition = mul(worldPosition, View);
 	output.Position = mul(viewPosition, Projection);
 
-	float4 normal = mul(input.Normal, WorldInverseTranspose);
+	float4x4 ModelView = mul(World, View);
+	float4 normal = mul(input.Normal, ModelView);//used to be WorldInverseTranspose
 	float lightIntensity = dot(normal, DiffuseLightDirection);
 	output.Color = saturate(DiffuseColor * DiffuseIntensity * lightIntensity);
 	output.Normal = normal;
@@ -144,8 +145,8 @@ float4 PSspotlight(VertexShaderOutput input) : COLOR0
 	float specularLight = calculateSpecular(pos, input.TextureCoordinate, input.Normal, L);
 
 	// Calculate the specular effect
-	/*if (diffuseLight <= 0)
-	specularLight = 0;*/
+	//if (diffuseLight <= 0)
+	//specularLight = 0;
 	float3 specular = lightColor * specularLight;
 
 
