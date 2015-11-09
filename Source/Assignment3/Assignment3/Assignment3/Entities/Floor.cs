@@ -35,7 +35,7 @@ namespace Assignment3.Entities
 
 
             model = content.Load<Model>("Models/Floor");
-            texture = content.Load<Texture2D>("Models/MarbleFloor");
+            texture = content.Load<Texture2D>("Models/Rock");
         }
         
         public override void update(GameTime gameTime, GamePadState gamepad, KeyboardState keyboard)
