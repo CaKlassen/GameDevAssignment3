@@ -16,6 +16,10 @@ float DiffuseIntensity = 1;
 float4 SpecularColor = float4(1, 1, 1, 0.05);
 float3 EyePosition;
 
+float fogNear = 250.0;
+float fogFar = 300.0;
+float4 fogColor = float4(1, 1, 1, 0.5);
+
 
 //Texture shading
 texture ModelTexture;
@@ -40,10 +44,11 @@ struct VertexShaderInput
 struct VertexShaderOutput
 {
 	float4 Position : POSITION0;
-	float3 Normal : TEXCOORD0;
-	float3 View : TEXCOORD1;
+	float4 PositionOut : TEXCOORD0;
+	float3 Normal : TEXCOORD1;
+	float3 View : TEXCOORD2;
 	//Texture shading
-	float3 TextureCoordinate : TEXCOORD2;
+	float3 TextureCoordinate : TEXCOORD3;
 };
 
 // The VertexShader.
@@ -54,6 +59,7 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input, float3 Normal :
 	float4 worldPosition = mul(input.Position, World);
 	float4 viewPosition = mul(worldPosition, View);
 	output.Position = mul(viewPosition, Projection);
+	output.PositionOut = mul(viewPosition, Projection);
 
 	float3 normal = normalize(mul(Normal, World));
 	output.Normal = normal;
@@ -73,10 +79,14 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 	float4 reflect = normalize(2 * diffuse*normal - float4(LightDirection,1.0));
 	float4 specular = pow(saturate(dot(reflect,input.View)), 15);
 	
+	float distance = length(input.PositionOut - EyePosition);
+
+	float fog = saturate((distance - fogNear) / (fogNear - fogFar));
+
 	float4 color = tex2D(textureSampler, input.TextureCoordinate);
 	color.rgb *= AmbientColor*AmbientIntensity + DiffuseIntensity*DiffuseColor*diffuse + SpecularColor*specular;
 
-	return color;
+	return fog * color + (1.0 - fog) * fogColor;
 }
 
 // Our Techinique
