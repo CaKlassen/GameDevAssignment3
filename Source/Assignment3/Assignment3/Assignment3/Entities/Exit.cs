@@ -56,7 +56,6 @@ namespace Assignment3.Entities
 
 
                     Matrix worldInverseTransposeMatrix = Matrix.Transpose(Matrix.Invert(mesh.ParentBone.Transform * worldMatrix));
-                    //effect.Parameters["WorldInverseTranspose"].SetValue(worldInverseTransposeMatrix);
                 }
                 // Draw the mesh, using the effects set above.
                 mesh.Draw();

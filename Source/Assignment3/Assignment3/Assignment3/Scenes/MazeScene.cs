@@ -106,8 +106,6 @@ namespace Assignment3.Scenes
 
             if (GamePad.GetState(PlayerIndex.One).IsConnected)
                 prevGP = GamePad.GetState(PlayerIndex.One);
-
-            //effect = new BasicEffect(BaseGame.instance.GraphicsDevice);
         }
 
         public override void update(GameTime gameTime, GamePadState gamepad, KeyboardState keyboard)
@@ -123,7 +121,7 @@ namespace Assignment3.Scenes
             if (!gamepad.IsConnected)//no controller
             {
                 //walking through walls feature
-                if (keyboard.IsKeyDown(Keys.P) && !prevKB.IsKeyDown(Keys.P))
+                if (keyboard.IsKeyDown(Keys.G) && !prevKB.IsKeyDown(Keys.G))
                 {
                     if (camera.walkThroughWalls)
                         camera.walkThroughWalls = false;
@@ -292,8 +290,6 @@ namespace Assignment3.Scenes
             Vector3 LAt = camera.getLookAt() -position;
 
             Console.Write("\nLookAt: " +Vector3.Normalize( LAt )+ "\n");
-            //Console.Write("\nView Vector: " + viewVector + "\n");
-            //Console.Write("\nPosition: " + position + "\n");
 
             HLSLeffect.CurrentTechnique = HLSLeffect.Techniques["ShaderTech"];
             
@@ -304,14 +300,12 @@ namespace Assignment3.Scenes
             HLSLeffect.Parameters["fogEnabled"].SetValue(fogEnabled);
             HLSLeffect.Parameters["FlashlightAngle"].SetValue(flashlight);
 
-            //HLSLeffect.Parameters["SpotlightConeAngle"].SetValue(MathHelper.ToRadians(23.5f));
             HLSLeffect.Parameters["LightDirection"].SetValue(Vector3.Normalize(LAt));
-            HLSLeffect.Parameters["EyePosition"].SetValue(position);//SetValue(Vector3.Transform(position, View));
-            //HLSLeffect.Parameters["lightColor"].SetValue(Color.White.ToVector3());
+            HLSLeffect.Parameters["EyePosition"].SetValue(position);
+
 
             HLSLeffect.Parameters["View"].SetValue(camera.View);
             HLSLeffect.Parameters["Projection"].SetValue(camera.Projection);
-            //HLSLeffect.Parameters["ViewVector"].SetValue(viewVector);
 
             floor.draw(sb, HLSLeffect);
             roof.draw(sb, HLSLeffect);
