@@ -25,7 +25,7 @@ float spotlightPower = 10;
 float3 spotlightPosition;//camera position
 float3 spotlightDirection;//camera lookat-position (normalized)
 float3 lightColor;
-float SpotlightConeAngle = 23.5;
+float SpotlightConeAngle;
 float ConstAttenuation = 1.0f;
 float LinearAttenuation = 0.2f;
 float QuadraticAttenuation = 0.1f;
@@ -61,7 +61,7 @@ float CalculateSpotCone(float3 spotDir, float3 lightDir)//lightDir is the light 
 {
 	float minCos = cos(SpotlightConeAngle);//inner cone
 	float maxCos = (minCos + 1.0f) / 2.0f;//outer cone
-	float CosAngle = dot(spotDir, -lightDir);//Angle between the spotlight direction and -L (L is vector of light from surface to source)
+	float CosAngle = dot(spotDir.xyz, -lightDir);//Angle between the spotlight direction and -L (L is vector of light from surface to source)
 	return smoothstep(minCos, maxCos, CosAngle);//interpolation of intensity between minCos and maxCos
 }
 

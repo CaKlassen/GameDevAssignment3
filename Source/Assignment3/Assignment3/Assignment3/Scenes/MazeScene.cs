@@ -260,7 +260,7 @@ namespace Assignment3.Scenes
             HLSLeffect.Parameters["AmbientColor"].SetValue(ambientColour);
             HLSLeffect.Parameters["AmbientIntensity"].SetValue(ambientIntensity);
 
-            
+            HLSLeffect.Parameters["SpotlightConeAngle"].SetValue(MathHelper.ToRadians(23.5f));
             HLSLeffect.Parameters["spotlightDirection"].SetValue(Vector3.Normalize(LAt));
             HLSLeffect.Parameters["spotlightPosition"].SetValue(position);//SetValue(Vector3.Transform(position, View));
             HLSLeffect.Parameters["lightColor"].SetValue(Color.White.ToVector3());
