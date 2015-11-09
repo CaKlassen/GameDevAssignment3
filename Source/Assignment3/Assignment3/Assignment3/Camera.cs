@@ -77,7 +77,8 @@ namespace Assignment3
 
         public Vector3 getLookAt()
         {
-            return LookAtDir;
+            return LookAt;
+            //return LookAtDir;
         }
 
 
@@ -132,8 +133,8 @@ namespace Assignment3
             Position = Pos;
             Rotation = Rot;
             //set player collision model position
-            if(MazeScene.instance.mazeRunner != null)
-                MazeScene.instance.mazeRunner.position = Position;
+            //if(MazeScene.instance.mazeRunner != null)
+            //    MazeScene.instance.mazeRunner.position = Position;
         }
 
         //update look at
