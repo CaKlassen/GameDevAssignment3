@@ -57,13 +57,6 @@ struct VertexShaderOutput
 	float3 TextureCoordinate : TEXCOORD1;
 };
 
-float CalculateSpotCone(float3 spotDir, float3 lightDir)//lightDir is the light from surface to source
-{
-	float minCos = cos(SpotlightConeAngle);//inner cone
-	float maxCos = (minCos + 1.0f) / 2.0f;//outer cone
-	float CosAngle = dot(spotDir.xyz, -lightDir);//Angle between the spotlight direction and -L (L is vector of light from surface to source)
-	return smoothstep(minCos, maxCos, CosAngle);//interpolation of intensity between minCos and maxCos
-}
 
 // VERTEX SHADER
 
@@ -87,66 +80,101 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 	return output;
 }
 
+// PIXEL SHADER HELPERS
+
+float CalculateSpotCone(float3 spotDir, float3 lightDir)//lightDir is the light from surface to source
+{
+	float minCos = cos(SpotlightConeAngle);//inner cone
+	float maxCos = (minCos + 1.0f) / 2.0f;//outer cone
+	float CosAngle = dot(spotDir.xyz, -lightDir);//Angle between the spotlight direction and -L (L is vector of light from surface to source)
+	return smoothstep(minCos, maxCos, CosAngle);//interpolation of intensity between minCos and maxCos
+}
+
+float calculateSpecular(float3 pos, float3 texCoordinate, float3 normal, float3 L)
+{
+	// Calculate Specular
+	float3 V = normalize(pos - texCoordinate);
+	float3 R = normalize(reflect(-L, normal));
+	float RdotV = max(0.0000000000000001f, dot(R, V));
+
+	// Create Phong
+	return pow(RdotV, Shininess);
+}
+
+float3 calculateDiffuse(float3 normal, float3 L)
+{
+	float diffuseLight = max(dot(normal, L), 0);
+	return DiffuseIntensity * lightColor * diffuseLight;
+}
+
 
 // PIXEL SHADER
 
 float4 PSspotlight(VertexShaderOutput input) : COLOR0
 {
-
-	float4 color = tex2D(textureSampler, input.TextureCoordinate);
-
-	//ambient
-	float3 ambient = AmbientColor * AmbientIntensity;//Ka = AmbientIntensity
-
+	// Calculate the transformed player position
 	float3 pos = spotlightPosition;
 
 	pos = mul(spotlightPosition, World);
 	pos = mul(pos, View);
-	//pos = mul(pos, Projection);
-	
+
+	// Calculate distance and length
 	float3 L = normalize(pos - input.TextureCoordinate);
 	float distance = length(L);
 	L = L / distance;
 
-	//attenuation
+	// Calculate attenuation based on distance
 	float attenuation = 1.0f / (ConstAttenuation + LinearAttenuation * distance + QuadraticAttenuation * distance * distance);
 
-	//spotlight intensity
-	float spotlightIntensity = CalculateSpotCone(spotlightDirection, L);
+	
+	//////////////////////
+	// GENERAL LIGHTING //
+	//////////////////////
 
-	//diffuse
-	float diffuseLight = max(dot(input.Normal, L), 0);
-	float3 diffuse = DiffuseIntensity * lightColor * diffuseLight;
+	// Calculate Ambient
+	float3 ambient = AmbientColor * AmbientIntensity;
 
-	//specular; Phong
-	float3 V = normalize(pos - input.TextureCoordinate);
-	float3 R = normalize(reflect(-L, input.Normal));
-	float RdotV = max(0.0000000000000001f, dot(R, V));
+	// Calculate Diffuse
+	float diffuse = calculateDiffuse(input.Normal, L);
 
-	/* THIS WAS BLINN-PHONG
-	float3 H = normalize(L + V);
-	float specularLight = pow(dot(input.Normal, H), SpecularIntensity);*/
-	float specularLight = pow(RdotV, Shininess);//THIS IS PHONG
+	// Calculate Colour from the texture
+	float4 color = tex2D(textureSampler, input.TextureCoordinate);
 
+	// Calculate Specular
+	float specularLight = calculateSpecular(pos, input.TextureCoordinate, input.Normal, L);
+
+	// Calculate the specular effect
 	/*if (diffuseLight <= 0)
-		specularLight = 0;*/
-	float3 specular = lightColor * specularLight;//specularIntensity *
+	specularLight = 0;*/
+	float3 specular = lightColor * specularLight;
 
 
-	//NOT USED ATM
-	//float spotlightScale = pow(max(dot(L, -spotlightDirection), 0), spotlightPower);
-	//float3 light = ambient + (diffuse + specular) * spotlightScale;
+	///////////////
+	// SPOTLIGHT //
+	///////////////
 
-	//finalize Diffuse and Specular
-	//diffuse = diffuse * attenuation * spotlightIntensity;
+	// Spotlight intensity
+	float spotlightIntensity = CalculateSpotCone(spotlightDirection, L);
+	
+
+	//////////////////
+	// FINALIZATION //
+	//////////////////
+
+	// Create the final diffuse and specular effects
+	diffuse = diffuse * attenuation * spotlightIntensity;
 	specular = specular * attenuation * spotlightIntensity;
 
+	// Calculate the final light level and colour
 	float3 light = ambient + diffuse + specular;
-
 	color.rgb *= light;
 
 	return color;
 }
+
+
+
+
 
 // TECHNIQUE
 
