@@ -43,7 +43,7 @@ namespace Assignment3
             BackBufferWidth = graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
             
             IsMouseVisible = false;
-            //graphics.IsFullScreen = true;
+            graphics.IsFullScreen = true;
         }
 
         /// <summary>
