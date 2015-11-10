@@ -282,9 +282,8 @@ namespace Assignment3.Scenes
             Vector3 viewVector = camera.getLookAt() - camera.Position;
             viewVector.Normalize();
             
-            //Matrix cameraWorld = Matrix.CreateTranslation(camera.Position);
             Vector3 position = camera.Position;
-            Vector3 LAt = camera.getLookAt() -position;
+            Vector3 LAt = camera.getLookAt() - position;
             
             HLSLeffect.CurrentTechnique = HLSLeffect.Techniques["ShaderTech"];
             
