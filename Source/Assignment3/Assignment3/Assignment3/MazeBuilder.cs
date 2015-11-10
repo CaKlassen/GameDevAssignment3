@@ -62,7 +62,7 @@ namespace Assignment3
 
             generateStartAndExit();
 
-            printDebugMaze();
+            //printDebugMaze();
 
             return rawMaze;
         }
