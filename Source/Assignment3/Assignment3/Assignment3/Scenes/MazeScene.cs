@@ -23,6 +23,16 @@ namespace Assignment3.Scenes
     {
         public static MazeScene instance;
 
+        private static int AMBIENT_RATE = 20;
+        private static Vector4 nightColour = new Vector4(0.05f, 0, 0.1f, 1);
+        private static Vector4 dayColour = new Vector4(1, 1, 0.9f, 1);
+        private static Vector4 nightFogColour = new Vector4(0.02f, 0.02f, 0.02f, 1);
+        private static Vector4 dayFogColour = new Vector4(0.4f, 0.4f, 0.4f, 1);
+        private static float dayFlashlight = 2.0f;
+        private static float nightFlashlight = 0.785398f;
+        private static float nightIntensity = 0.9f;
+        private static float dayIntensity = 0.2f;
+
         public Camera camera;
         public Player mazeRunner;
 
@@ -43,17 +53,7 @@ namespace Assignment3.Scenes
         public Matrix World;
 
         public Effect HLSLeffect;
-
-        private static int AMBIENT_RATE = 20;
-        private static Vector4 nightColour = new Vector4(0.05f, 0, 0.1f, 1);
-        private static Vector4 dayColour = new Vector4(1, 1, 0.9f, 1);
-        private static Vector4 nightFogColour = new Vector4(0.02f, 0.02f, 0.02f, 1);
-        private static Vector4 dayFogColour = new Vector4(0.4f, 0.4f, 0.4f, 1);
-        private static float dayFlashlight = 2.0f;
-        private static float nightFlashlight = 0.785398f;
-        private static float nightIntensity = 0.9f;
-        private static float dayIntensity = 0.2f;
-
+        
         private Vector4 ambientColour = dayColour;
         private Vector4 fogColour = dayFogColour;
         bool fogEnabled = true;
@@ -281,16 +281,11 @@ namespace Assignment3.Scenes
             // Update the shader parameters
             Vector3 viewVector = camera.getLookAt() - camera.Position;
             viewVector.Normalize();
-
-
-
-            //test
-            Matrix cameraWorld = Matrix.CreateTranslation(camera.Position);
+            
+            //Matrix cameraWorld = Matrix.CreateTranslation(camera.Position);
             Vector3 position = camera.Position;
             Vector3 LAt = camera.getLookAt() -position;
-
-            Console.Write("\nLookAt: " +Vector3.Normalize( LAt )+ "\n");
-
+            
             HLSLeffect.CurrentTechnique = HLSLeffect.Techniques["ShaderTech"];
             
             HLSLeffect.Parameters["AmbientColor"].SetValue(ambientColour);
